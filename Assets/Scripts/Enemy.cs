@@ -80,29 +80,31 @@ public class Enemy : MonoBehaviour
 		else if (collider2D.tag == "projectile")
 		{
 			Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
-			try
-			{
-				enemyHit(newP.AttackStrength);
-			}
-			catch (Exception ex)
-			{
-				Debug.LogError(ex);
-			}
+
+			enemyHit(newP.AttackStrength);
+
 			Destroy(collider2D.gameObject);
 		}
 	}
 	public void enemyHit(int hitPoints)
 	{
-		if (healthPoints - hitPoints > 0)
+		try
 		{
-			healthPoints -= hitPoints;
-			anim.Play("Hurt");
-			GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Hit);
+			if (healthPoints - hitPoints > 0)
+			{
+				healthPoints -= hitPoints;
+				anim.Play("Hurt");
+				GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Hit);
+			}
+			else
+			{
+				anim.SetTrigger("didDie");
+				die();
+			}
 		}
-		else
+		catch (Exception ex)
 		{
-			anim.SetTrigger("didDie");
-			die();
+			Debug.LogError(ex);
 		}
 	}
 

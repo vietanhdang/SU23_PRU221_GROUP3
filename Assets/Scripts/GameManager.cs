@@ -196,7 +196,7 @@ public class GameManager : Singleton<GameManager> {
             default:
                 totalEnemies = 5;
                 totalEscaped = 0;
-                TotalMoney = 20;
+                //TotalMoney = 20;
                 //TowerManager.Instance.DestroyAllTower();
                 TowerManager.Instance.RenameTagsBuildSites();
                 totalMoneyLabel.text = TotalMoney.ToString();
