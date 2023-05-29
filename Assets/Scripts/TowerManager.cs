@@ -31,7 +31,6 @@ public class TowerManager : Singleton<TowerManager> {
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
             //Check to see if mouse press location is on buildSites
-            
             if(hit.collider.tag == "buildSite")
             {
                 buildTile = hit.collider;
@@ -80,7 +79,7 @@ public class TowerManager : Singleton<TowerManager> {
     {
         //If the pointer is not over the Tower Button GameObject && the tower button has been pressed
         //Created new tower at the click location
-        if (!EventSystem.current.IsPointerOverGameObject() && towerButtonPressed != null)
+        if (towerButtonPressed != null)
         {
             Tower newTower = Instantiate(towerButtonPressed.TowerObject);
             newTower.transform.position = hit.transform.position;
@@ -116,6 +115,7 @@ public class TowerManager : Singleton<TowerManager> {
         spriteRenderer.sprite = sprite; //Set sprite to the one we passed in the parameter
         spriteRenderer.sortingOrder = 10;
     }
+
     public void disableDragSprite()
     {
         spriteRenderer.enabled = false;
