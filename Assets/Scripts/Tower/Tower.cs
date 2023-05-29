@@ -11,17 +11,19 @@ public class Tower : MonoBehaviour {
     [SerializeField]
     private Projectile projectile;      //Type of Projectile
     private Enemy targetEnemy = null;
-    private float attackCounter;
     private bool isAttacking = false;
+
+	Timer timer;
 
 	// Use this for initialization
 	void Start () {
-		
+		timer = gameObject.AddComponent<Timer>();
+		timer.Duration = timeBetweenAttacks;
+		timer.Run();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        attackCounter -= Time.deltaTime;
         //If our closest enemy in range and if its within our attackRange, set our target enemy to the closest enemy in range.
         if (targetEnemy == null || targetEnemy.IsDead)
         {
@@ -33,14 +35,14 @@ public class Tower : MonoBehaviour {
         }
         else
         {
-            if(attackCounter <= 0f)
+            if(timer.Finished && isAttacking == true)
             {
-                isAttacking = true;
-                attackCounter = timeBetweenAttacks; //reset attack counter
-            }
+                Attack();
+				timer.Run();
+			}
             else
             {
-                isAttacking = false;
+                isAttacking = true;
             }
             //If enemy gets out of attack range, then that enemy can no longer be targeted
             if (Vector2.Distance(transform.position, targetEnemy.transform.position) > attackRange)
@@ -50,11 +52,7 @@ public class Tower : MonoBehaviour {
         }
 
 	}
-    void FixedUpdate()
-    {
-        if (isAttacking) { Attack(); }
 
-    }
     public void Attack()
     {
         isAttacking = false;

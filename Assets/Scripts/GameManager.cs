@@ -161,10 +161,6 @@ public class GameManager : Singleton<GameManager> {
         {
             currentState = gameStatus.play;
         }
-        else if(waveNumber >= totalWaves)
-        {
-            currentState = gameStatus.win;
-        }
         else
         {
             currentState = gameStatus.next;
@@ -185,9 +181,6 @@ public class GameManager : Singleton<GameManager> {
             case gameStatus.play:
                 playButtonLabel.text = "Play";
                 break;
-            case gameStatus.win:
-                playButtonLabel.text = "Play";
-                break;
         }
         playButton.gameObject.SetActive(true);
     }
@@ -201,10 +194,10 @@ public class GameManager : Singleton<GameManager> {
                 totalEnemies += waveNumber;
                 break;
             default:
-                totalEnemies = 3;
+                totalEnemies = 5;
                 totalEscaped = 0;
-                TotalMoney = 10;
-                TowerManager.Instance.DestroyAllTower();
+                //TotalMoney = 20;
+                //TowerManager.Instance.DestroyAllTower();
                 TowerManager.Instance.RenameTagsBuildSites();
                 totalMoneyLabel.text = TotalMoney.ToString();
                 totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
@@ -212,7 +205,8 @@ public class GameManager : Singleton<GameManager> {
                 break;
         }
         DestroyAllEnemies();
-        TotalKilled = 0;
+		//TowerManager.Instance.DestroyAllTower();
+		TotalKilled = 0;
         RoundEscaped = 0;
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
         StartCoroutine(spawn());
