@@ -32,7 +32,7 @@ public class GameManager : Singleton<GameManager> {
     private Button playButton;
 
     private int waveNumber = 0;
-    private int totalMoney = 10;
+    private int totalMoney = 25;
     private int totalEscaped = 0;
     private int roundEscaped = 0;
     private int totalKilled = 0;
@@ -42,7 +42,7 @@ public class GameManager : Singleton<GameManager> {
     private AudioSource audioSource;
 
     public List<Enemy> EnemyList = new List<Enemy>();
-    const float spawnDelay = 2f; //Spawn Delay in seconds
+    const float spawnDelay = 1.5f; //Spawn Delay in seconds
 
     public int TotalMoney
     {
@@ -88,7 +88,6 @@ public class GameManager : Singleton<GameManager> {
         handleEscape();
 	}
 
-    //This will spawn enemies, wait for the given spawnDelay then call itself again to spawn another enemy
     IEnumerator spawn()
     {
         if (enemiesPerSpawn > 0 && EnemyList.Count < totalEnemies)
@@ -97,8 +96,21 @@ public class GameManager : Singleton<GameManager> {
             {
                 if (EnemyList.Count < totalEnemies)
                 {
-                    Enemy newEnemy = Instantiate(enemies[Random.Range(0, enemiesToSpawn)]);
-                    newEnemy.transform.position = spawnPoint.transform.position;
+                    if (whichEnemiesToSpawn == 0)
+                    {
+                        // Create a new queue with all enemy types
+                        Queue<Enemy> enemyQueue = new Queue<Enemy>(enemies);
+                        whichEnemiesToSpawn = enemyQueue.Count;
+                    }
+
+                    // Dequeue an enemy from the front of the queue and spawn it
+                    Enemy enemyToSpawn = whichEnemiesToSpawn > 0 ? enemies[enemies.Length - whichEnemiesToSpawn] : null;
+                    if (enemyToSpawn != null)
+                    {
+                        Enemy newEnemy = Instantiate(enemyToSpawn);
+                        newEnemy.transform.position = spawnPoint.transform.position;
+                        whichEnemiesToSpawn--;
+                    }
                 }
             }
             yield return new WaitForSeconds(spawnDelay);
@@ -194,7 +206,7 @@ public class GameManager : Singleton<GameManager> {
                 totalEnemies += waveNumber;
                 break;
             default:
-                totalEnemies = 5;
+                totalEnemies = 3;
                 totalEscaped = 0;
                 //TotalMoney = 20;
                 //TowerManager.Instance.DestroyAllTower();

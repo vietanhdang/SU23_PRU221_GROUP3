@@ -25,4 +25,9 @@ public class Projectile : MonoBehaviour {
     {
         get { return projectileType; }
     }
+
+    private void Update()
+    {
+        Destroy(gameObject, 5);
+    }
 }
