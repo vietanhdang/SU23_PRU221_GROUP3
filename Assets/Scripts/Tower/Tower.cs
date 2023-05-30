@@ -57,7 +57,7 @@ public class Tower : MonoBehaviour {
     {
         isAttacking = false;
         Projectile newProjectile = Instantiate(projectile) as Projectile;
-        newProjectile.transform.localPosition = transform.localPosition;
+        newProjectile.transform.localPosition = transform.position;
 
         if(newProjectile.ProjectileType == ProjectileType.arrow)
         {

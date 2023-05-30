@@ -2,23 +2,26 @@
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
-public class TowerManager : Singleton<TowerManager> {
+public class TowerManager : Singleton<TowerManager>
+{
     public TowerButton towerButtonPressed { get; set; }
     private SpriteRenderer spriteRenderer;  //Setting image to our tower
     private List<Tower> TowerList = new List<Tower>();
     private List<Collider2D> BuildList = new List<Collider2D>();
     private Collider2D buildTile;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         spriteRenderer = GetComponent<SpriteRenderer>();
         buildTile = GetComponent<Collider2D>();
         spriteRenderer.enabled = false;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (Input.GetMouseButtonDown(0))
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
             //worldPoint is the position of the mouse click.
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -31,7 +34,7 @@ public class TowerManager : Singleton<TowerManager> {
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
             //Check to see if mouse press location is on buildSites
-            if(hit.collider.tag == "buildSite")
+            if (hit.collider.tag == "buildSite")
             {
                 buildTile = hit.collider;
                 buildTile.tag = "buildSiteFull";     //This prevents us from stacking towers ontop of each other.
@@ -47,6 +50,7 @@ public class TowerManager : Singleton<TowerManager> {
         }
     }
 
+
     public void RegisterBuildSite(Collider2D buildTag)
     {
         BuildList.Add(buildTag);
@@ -59,7 +63,7 @@ public class TowerManager : Singleton<TowerManager> {
 
     public void RenameTagsBuildSites()
     {
-        foreach(Collider2D buildTag in BuildList)
+        foreach (Collider2D buildTag in BuildList)
         {
             buildTag.tag = "buildSite";
         }
@@ -68,18 +72,19 @@ public class TowerManager : Singleton<TowerManager> {
 
     public void DestroyAllTower()
     {
-        foreach(Tower tower in TowerList)
+        foreach (Tower tower in TowerList)
         {
             Destroy(tower.gameObject);
         }
         TowerList.Clear();
     }
+
     //Place new tower on the mouse click location
     public void placeTower(RaycastHit2D hit)
     {
         //If the pointer is not over the Tower Button GameObject && the tower button has been pressed
         //Created new tower at the click location
-        if (towerButtonPressed != null)
+        if (towerButtonPressed != null && towerButtonPressed.TowerPrice <= GameManager.Instance.TotalMoney)
         {
             Tower newTower = Instantiate(towerButtonPressed.TowerObject);
             newTower.transform.position = hit.transform.position;
@@ -94,9 +99,10 @@ public class TowerManager : Singleton<TowerManager> {
         GameManager.Instance.SubtractMoney(price);
 
     }
+
     public void selectedTower(TowerButton towerSelected)
     {
-        if(towerSelected.TowerPrice <= GameManager.Instance.TotalMoney)
+        if (towerSelected.TowerPrice <= GameManager.Instance.TotalMoney)
         {
             towerButtonPressed = towerSelected;
             enableDragSprite(towerSelected.DragSprite);

@@ -7,7 +7,8 @@ public enum gameStatus
 {
     next, play, gameover, win
 }
-public class GameManager : Singleton<GameManager> {
+public class GameManager : Singleton<GameManager>
+{
     //SerializeField - Allows Inspector to get access to private fields.
     //If we want to get access to this from another class, we'll just need to make public getters
     [SerializeField]
@@ -31,8 +32,10 @@ public class GameManager : Singleton<GameManager> {
     [SerializeField]
     private Button playButton;
 
+    public float[] enemySpawnRates = new float[] { 0.7f, 0.2f, 0.1f };
+
     private int waveNumber = 0;
-    private int totalMoney = 10;
+    private int totalMoney = 25;
     private int totalEscaped = 0;
     private int roundEscaped = 0;
     private int totalKilled = 0;
@@ -42,7 +45,7 @@ public class GameManager : Singleton<GameManager> {
     private AudioSource audioSource;
 
     public List<Enemy> EnemyList = new List<Enemy>();
-    const float spawnDelay = 2f; //Spawn Delay in seconds
+    const float spawnDelay = 1.5f; //Spawn Delay in seconds
 
     public int TotalMoney
     {
@@ -59,7 +62,7 @@ public class GameManager : Singleton<GameManager> {
         get { return totalEscaped; }
         set { totalEscaped = value; }
     }
- 
+
     public int RoundEscaped
     {
         get { return roundEscaped; }
@@ -75,20 +78,21 @@ public class GameManager : Singleton<GameManager> {
     {
         get { return audioSource; }
     }
-    
+
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         playButton.gameObject.SetActive(false);
         audioSource = GetComponent<AudioSource>();
         ShowMenu();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        handleEscape();
-	}
+    }
 
-    //This will spawn enemies, wait for the given spawnDelay then call itself again to spawn another enemy
+    // Update is called once per frame
+    void Update()
+    {
+        handleEscape();
+    }
+
     IEnumerator spawn()
     {
         if (enemiesPerSpawn > 0 && EnemyList.Count < totalEnemies)
@@ -97,8 +101,21 @@ public class GameManager : Singleton<GameManager> {
             {
                 if (EnemyList.Count < totalEnemies)
                 {
-                    Enemy newEnemy = Instantiate(enemies[Random.Range(0, enemiesToSpawn)]);
-                    newEnemy.transform.position = spawnPoint.transform.position;
+                    if (whichEnemiesToSpawn == 0)
+                    {
+                        // Create a new queue with all enemy types
+                        Queue<Enemy> enemyQueue = new Queue<Enemy>(enemies);
+                        whichEnemiesToSpawn = enemyQueue.Count;
+                    }
+
+                    // Dequeue an enemy from the front of the queue and spawn it
+                    Enemy enemyToSpawn = whichEnemiesToSpawn > 0 ? enemies[enemies.Length - whichEnemiesToSpawn] : null;
+                    if (enemyToSpawn != null)
+                    {
+                        Enemy newEnemy = Instantiate(enemyToSpawn);
+                        newEnemy.transform.position = spawnPoint.transform.position;
+                        whichEnemiesToSpawn--;
+                    }
                 }
             }
             yield return new WaitForSeconds(spawnDelay);
@@ -120,7 +137,7 @@ public class GameManager : Singleton<GameManager> {
     ///Destroy - At the end of the wave
     public void DestroyAllEnemies()
     {
-        foreach(Enemy enemy in EnemyList)
+        foreach (Enemy enemy in EnemyList)
         {
             Destroy(enemy.gameObject);
         }
@@ -142,7 +159,7 @@ public class GameManager : Singleton<GameManager> {
         totalEscapedLabel.text = "Escaped " + TotalEscape + "/10";
         if (RoundEscaped + TotalKilled == totalEnemies)
         {
-            if(waveNumber <= enemies.Length)
+            if (waveNumber <= enemies.Length)
             {
                 enemiesToSpawn = waveNumber;
             }
@@ -153,11 +170,11 @@ public class GameManager : Singleton<GameManager> {
 
     public void setCurrentGameState()
     {
-        if(totalEscaped >= 10)
+        if (totalEscaped >= 10)
         {
             currentState = gameStatus.gameover;
         }
-        else if(waveNumber == 0 && (TotalKilled + RoundEscaped) == 0)
+        else if (waveNumber == 0 && (TotalKilled + RoundEscaped) == 0)
         {
             currentState = gameStatus.play;
         }
@@ -194,7 +211,7 @@ public class GameManager : Singleton<GameManager> {
                 totalEnemies += waveNumber;
                 break;
             default:
-                totalEnemies = 5;
+                totalEnemies = 3;
                 totalEscaped = 0;
                 //TotalMoney = 20;
                 //TowerManager.Instance.DestroyAllTower();
@@ -205,8 +222,8 @@ public class GameManager : Singleton<GameManager> {
                 break;
         }
         DestroyAllEnemies();
-		//TowerManager.Instance.DestroyAllTower();
-		TotalKilled = 0;
+        //TowerManager.Instance.DestroyAllTower();
+        TotalKilled = 0;
         RoundEscaped = 0;
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
         StartCoroutine(spawn());
