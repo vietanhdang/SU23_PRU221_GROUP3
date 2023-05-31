@@ -84,10 +84,10 @@ public class Enemy : MonoBehaviour
 			try
 			{
                 enemyHit(newP.AttackStrength);
-            } catch (Exception e)
+            } catch (NullReferenceException ex)
 			{
-
-			}
+                Debug.LogWarning("Projectile component not found on the colliding object with tag 'projectile'." + ex.Message);
+            }
 
 			Destroy(collider2D.gameObject);
 		}
