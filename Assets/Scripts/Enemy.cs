@@ -75,7 +75,7 @@ public class Enemy : MonoBehaviour
 			GameManager.Instance.RoundEscaped += 1;
 			GameManager.Instance.TotalEscape += 1;
 			GameManager.Instance.UnregisterEnemy(this);
-			GameManager.Instance.isWaveOver();
+			GameManager.Instance.IsWaveOver();
 		}
 		else if (collider2D.tag == "projectile")
 		{
@@ -83,7 +83,7 @@ public class Enemy : MonoBehaviour
 
 			try
 			{
-                enemyHit(newP.AttackStrength);
+                EnemyHit(newP.AttackStrength);
             } catch (NullReferenceException ex)
 			{
                 Debug.LogWarning("Projectile component not found on the colliding object with tag 'projectile'." + ex.Message);
@@ -92,7 +92,7 @@ public class Enemy : MonoBehaviour
 			Destroy(collider2D.gameObject);
 		}
 	}
-	public void enemyHit(int hitPoints)
+	public void EnemyHit(int hitPoints)
 	{
 		try
 		{
@@ -105,7 +105,7 @@ public class Enemy : MonoBehaviour
 			else
 			{
 				anim.SetTrigger("didDie");
-				die();
+				Die();
 			}
 		}
 		catch (Exception ex)
@@ -114,13 +114,16 @@ public class Enemy : MonoBehaviour
 		}
 	}
 
-	public void die()
+	public void Die()
 	{
 		isDead = true;
 		enemyCollider.enabled = false;
 		GameManager.Instance.TotalKilled += 1;
 		GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Death);
 		GameManager.Instance.AddMoney(rewardAmount);
-		GameManager.Instance.isWaveOver();
-	}
+		GameManager.Instance.IsWaveOver();
+
+        // Destroy Game Object after 3 seconds
+        Destroy(gameObject, 3);
+    }
 }
