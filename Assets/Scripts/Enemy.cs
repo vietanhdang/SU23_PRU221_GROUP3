@@ -81,7 +81,13 @@ public class Enemy : MonoBehaviour
 		{
 			Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
 
-			enemyHit(newP.AttackStrength);
+			try
+			{
+                enemyHit(newP.AttackStrength);
+            } catch (Exception e)
+			{
+
+			}
 
 			Destroy(collider2D.gameObject);
 		}

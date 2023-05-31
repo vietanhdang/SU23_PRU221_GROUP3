@@ -79,7 +79,7 @@ public class TowerManager : Singleton<TowerManager> {
     {
         //If the pointer is not over the Tower Button GameObject && the tower button has been pressed
         //Created new tower at the click location
-        if (towerButtonPressed != null)
+        if (towerButtonPressed != null && towerButtonPressed.TowerPrice <= GameManager.Instance.TotalMoney)
         {
             Tower newTower = Instantiate(towerButtonPressed.TowerObject);
             newTower.transform.position = hit.transform.position;
