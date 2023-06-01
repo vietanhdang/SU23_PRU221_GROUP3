@@ -4,31 +4,35 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour {
 
+    
+    public float TimeBetweenAttacks{ get; set; }    //AKA - Attack Speed
+    
+    public float AttackRange { get; set; }      //AKA - Attack Radius
     [SerializeField]
-    private float timeBetweenAttacks;   //AKA - Attack Speed
-    [SerializeField]
-    private float attackRange;          //AKA - Attack Radius
-    [SerializeField]
-    private Projectile projectile;      //Type of Projectile
-    private Enemy targetEnemy = null;
-    private bool isAttacking = false;
+    protected Projectile projectile;      //Type of Projectile
+    protected Enemy targetEnemy = null;
+    protected bool isAttacking = false;
 
 	Timer timer;
-
+    protected  void Init(float timeBetweenAttacks, float attackRange)
+    {
+        TimeBetweenAttacks = timeBetweenAttacks;
+        AttackRange = attackRange;
+    }
 	// Use this for initialization
-	void Start () {
+	  public virtual void Start () {
 		timer = gameObject.AddComponent<Timer>();
-		timer.Duration = timeBetweenAttacks;
+		timer.Duration = TimeBetweenAttacks;
 		timer.Run();
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    public virtual void Update () {
         //If our closest enemy in range and if its within our attackRange, set our target enemy to the closest enemy in range.
         if (targetEnemy == null || targetEnemy.IsDead)
         {
             Enemy closestEnemy = GetClosestEnemyInRange();
-            if(closestEnemy != null && Vector2.Distance(transform.localPosition, closestEnemy.transform.position) <= attackRange)
+            if(closestEnemy != null && Vector2.Distance(transform.localPosition, closestEnemy.transform.position) <= AttackRange)
             {
                 targetEnemy = closestEnemy;
             }
@@ -45,7 +49,7 @@ public class Tower : MonoBehaviour {
                 isAttacking = true;
             }
             //If enemy gets out of attack range, then that enemy can no longer be targeted
-            if (Vector2.Distance(transform.position, targetEnemy.transform.position) > attackRange)
+            if (Vector2.Distance(transform.position, targetEnemy.transform.position) > AttackRange)
             {
                 targetEnemy = null;
             }
@@ -53,7 +57,7 @@ public class Tower : MonoBehaviour {
 
 	}
 
-    public void Attack()
+    public virtual void Attack()
     {
         isAttacking = false;
         Projectile newProjectile = Instantiate(projectile) as Projectile;
@@ -102,7 +106,9 @@ public class Tower : MonoBehaviour {
     }
 
     ///Get the current target's distance
-    private float GetTargetDistance(Enemy enemy)
+
+    protected float getTargetDistance(Enemy enemy)
+
     {
         if(enemy == null)
         {
@@ -115,14 +121,18 @@ public class Tower : MonoBehaviour {
         return Mathf.Abs(Vector2.Distance(transform.localPosition, enemy.transform.localPosition));
     }
     ///Get Enemies in Attack Range
-    private List<Enemy> GetEnemiesInRange()
+    protected List<Enemy> GetEnemiesInRange()
     {
         List<Enemy> enemiesInRange = new List<Enemy>();
 
         //Check if enemies are in range
         foreach(Enemy enemy in GameManager.Instance.EnemyList)
         {
+
+          
+
             if(enemy != null && Vector2.Distance(transform.localPosition, enemy.transform.localPosition) <= attackRange && !enemy.IsDead)
+
             {
                 enemiesInRange.Add(enemy);
             }
@@ -130,7 +140,7 @@ public class Tower : MonoBehaviour {
         return enemiesInRange;
     }
     ///Get Closest Enemy - Foreach enemy in range, get the closest enemy
-    private Enemy GetClosestEnemyInRange()
+    protected Enemy GetClosestEnemyInRange()
     {
         Enemy closestEnemy = null;
         float smallestDistance = float.PositiveInfinity; 
