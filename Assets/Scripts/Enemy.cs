@@ -63,65 +63,67 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    //If we trigger the collider2D.tag for checkpoints for finish. 
-    //If it hits the checkpoints, increase the index and move to the next checkpoint
-    //otherwise enemy is at the finish line and should be destroyed.
-    void OnTriggerEnter2D(Collider2D collider2D)
-    {
-        if (collider2D.tag == "checkpoint")
-            target += 1;
-        else if (collider2D.tag == "Finish")
-        {
-            GameManager.Instance.RoundEscaped += 1;
-            GameManager.Instance.TotalEscape += 1;
-            GameManager.Instance.UnregisterEnemy(this);
-            GameManager.Instance.isWaveOver();
-        }
-        else if (collider2D.tag == "projectile")
-        {
-            Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
+	//If we trigger the collider2D.tag for checkpoints for finish. 
+	//If it hits the checkpoints, increase the index and move to the next checkpoint
+	//otherwise enemy is at the finish line and should be destroyed.
+	void OnTriggerEnter2D(Collider2D collider2D)
+	{
+		if (collider2D.tag == "checkpoint")
+			target += 1;
+		else if (collider2D.tag == "Finish")
+		{
+			GameManager.Instance.RoundEscaped += 1;
+			GameManager.Instance.TotalEscape += 1;
+			GameManager.Instance.UnregisterEnemy(this);
+			GameManager.Instance.IsWaveOver();
+		}
+		else if (collider2D.tag == "projectile")
+		{
+			Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
 
-            try
-            {
-                enemyHit(newP.AttackStrength);
+			try
+			{
+                EnemyHit(newP.AttackStrength);
+            } catch (NullReferenceException ex)
+			{
+                Debug.LogWarning("Projectile component not found on the colliding object with tag 'projectile'." + ex.Message);
             }
-            catch (Exception ex)
-            {
 
-            }
+			Destroy(collider2D.gameObject);
+		}
+	}
+	public void EnemyHit(int hitPoints)
+	{
+		try
+		{
+			if (healthPoints - hitPoints > 0)
+			{
+				healthPoints -= hitPoints;
+				anim.Play("Hurt");
+				GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Hit);
+			}
+			else
+			{
+				anim.SetTrigger("didDie");
+				Die();
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError(ex);
+		}
+	}
 
-            Destroy(collider2D.gameObject);
-        }
-    }
-    public void enemyHit(int hitPoints)
-    {
-        try
-        {
-            if (healthPoints - hitPoints > 0)
-            {
-                healthPoints -= hitPoints;
-                anim.Play("Hurt");
-                GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Hit);
-            }
-            else
-            {
-                anim.SetTrigger("didDie");
-                die();
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
-    }
+	public void Die()
+	{
+		isDead = true;
+		enemyCollider.enabled = false;
+		GameManager.Instance.TotalKilled += 1;
+		GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Death);
+		GameManager.Instance.AddMoney(rewardAmount);
+		GameManager.Instance.IsWaveOver();
 
-    public void die()
-    {
-        isDead = true;
-        enemyCollider.enabled = false;
-        GameManager.Instance.TotalKilled += 1;
-        GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Death);
-        GameManager.Instance.AddMoney(rewardAmount);
-        GameManager.Instance.isWaveOver();
+        // Destroy Game Object after 3 seconds
+        Destroy(gameObject, 3);
     }
 }
