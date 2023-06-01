@@ -13,6 +13,8 @@ public class Tower : MonoBehaviour {
     protected Enemy targetEnemy = null;
     protected bool isAttacking = false;
 
+    public TowerLevel towerLevel = TowerLevel.level1;
+
 	Timer timer;
     protected  void Init(float timeBetweenAttacks, float attackRange)
     {
@@ -87,7 +89,7 @@ public class Tower : MonoBehaviour {
     ///Move Projectile to Target Enemy
     IEnumerator MoveProjectile(Projectile projectile)
     {
-        while(GetTargetDistance(targetEnemy) > 0.20f && projectile != null && targetEnemy != null)
+        while(getTargetDistance(targetEnemy) > 0.20f && projectile != null && targetEnemy != null)
         {
             if (targetEnemy == null || targetEnemy.IsDead)
             {
@@ -131,7 +133,7 @@ public class Tower : MonoBehaviour {
 
           
 
-            if(enemy != null && Vector2.Distance(transform.localPosition, enemy.transform.localPosition) <= attackRange && !enemy.IsDead)
+            if(enemy != null && Vector2.Distance(transform.localPosition, enemy.transform.localPosition) <= AttackRange && !enemy.IsDead)
 
             {
                 enemiesInRange.Add(enemy);

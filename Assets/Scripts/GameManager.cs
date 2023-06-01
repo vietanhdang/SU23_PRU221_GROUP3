@@ -135,7 +135,10 @@ public class GameManager : Singleton<GameManager>
     {
         foreach (Enemy enemy in EnemyList)
         {
-            Destroy(enemy.gameObject);
+            if(enemy != null)
+            {
+				Destroy(enemy.gameObject);
+			}
         }
         EnemyList.Clear();
     }
