@@ -9,8 +9,8 @@ public class Enemy : MonoBehaviour
 	//If we want to get access to this from another class, we'll just need to make public getters
 	[SerializeField]
 	private Transform exitPoint;
-	[SerializeField]
-	private Transform[] wayPoints;
+    [SerializeField]
+    private Transform[] wayPoints;
 	[SerializeField]
 	private float navigationUpdate;
 	[SerializeField]
