@@ -43,7 +43,6 @@ public class GameManager : Singleton<GameManager> {
 
     public List<Enemy> EnemyList = new List<Enemy>();
     const float spawnDelay = 1.5f; //Spawn Delay in seconds
-
     public int TotalMoney
     {
         get { return totalMoney; }
@@ -53,13 +52,11 @@ public class GameManager : Singleton<GameManager> {
             totalMoneyLabel.text = totalMoney.ToString();
         }
     }
-
     public int TotalEscape
     {
         get { return totalEscaped; }
         set { totalEscaped = value; }
     }
- 
     public int RoundEscaped
     {
         get { return roundEscaped; }
@@ -85,10 +82,10 @@ public class GameManager : Singleton<GameManager> {
 	
 	// Update is called once per frame
 	void Update () {
-        handleEscape();
+        HandleEscape();
 	}
 
-    IEnumerator spawn()
+    IEnumerator Spawn()
     {
         if (enemiesPerSpawn > 0 && EnemyList.Count < totalEnemies)
         {
@@ -114,7 +111,7 @@ public class GameManager : Singleton<GameManager> {
                 }
             }
             yield return new WaitForSeconds(spawnDelay);
-            StartCoroutine(spawn());
+            StartCoroutine(Spawn());
         }
     }
 
@@ -149,7 +146,7 @@ public class GameManager : Singleton<GameManager> {
         TotalMoney -= amount;
     }
 
-    public void isWaveOver()
+    public void IsWaveOver()
     {
         totalEscapedLabel.text = "Escaped " + TotalEscape + "/10";
         if (RoundEscaped + TotalKilled == totalEnemies)
@@ -158,12 +155,12 @@ public class GameManager : Singleton<GameManager> {
             {
                 enemiesToSpawn = waveNumber;
             }
-            setCurrentGameState();
+            SetCurrentGameState();
             ShowMenu();
         }
     }
 
-    public void setCurrentGameState()
+    public void SetCurrentGameState()
     {
         if(totalEscaped >= 10)
         {
@@ -221,14 +218,14 @@ public class GameManager : Singleton<GameManager> {
 		TotalKilled = 0;
         RoundEscaped = 0;
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
-        StartCoroutine(spawn());
+        StartCoroutine(Spawn());
         playButton.gameObject.SetActive(false);
     }
-    private void handleEscape()
+    private void HandleEscape()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            TowerManager.Instance.disableDragSprite();
+            TowerManager.Instance.DisableDragSprite();
             TowerManager.Instance.towerButtonPressed = null;
         }
     }

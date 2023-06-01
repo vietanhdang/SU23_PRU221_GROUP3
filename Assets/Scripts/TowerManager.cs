@@ -36,14 +36,14 @@ public class TowerManager : Singleton<TowerManager> {
                 buildTile = hit.collider;
                 buildTile.tag = "buildSiteFull";     //This prevents us from stacking towers ontop of each other.
                 RegisterBuildSite(buildTile);
-                placeTower(hit);
+                PlaceTower(hit);
             }
         }
 
         //When we have a sprite enabled, have it follow the mouse (I.E - Placing a Tower)
         if (spriteRenderer.enabled)
         {
-            followMouse();
+            FollowMouse();
         }
     }
 
@@ -75,7 +75,7 @@ public class TowerManager : Singleton<TowerManager> {
         TowerList.Clear();
     }
     //Place new tower on the mouse click location
-    public void placeTower(RaycastHit2D hit)
+    public void PlaceTower(RaycastHit2D hit)
     {
         //If the pointer is not over the Tower Button GameObject && the tower button has been pressed
         //Created new tower at the click location
@@ -83,13 +83,13 @@ public class TowerManager : Singleton<TowerManager> {
         {
             Tower newTower = Instantiate(towerButtonPressed.TowerObject);
             newTower.transform.position = hit.transform.position;
-            buyTower(towerButtonPressed.TowerPrice);
+            BuyTower(towerButtonPressed.TowerPrice);
             GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.TowerBuilt);
             RegisterTower(newTower);
-            disableDragSprite();
+            DisableDragSprite();
         }
     }
-    public void buyTower(int price)
+    public void BuyTower(int price)
     {
         GameManager.Instance.SubtractMoney(price);
 
@@ -99,24 +99,24 @@ public class TowerManager : Singleton<TowerManager> {
         if(towerSelected.TowerPrice <= GameManager.Instance.TotalMoney)
         {
             towerButtonPressed = towerSelected;
-            enableDragSprite(towerSelected.DragSprite);
+            EnableDragSprite(towerSelected.DragSprite);
         }
     }
 
-    public void followMouse()
+    public void FollowMouse()
     {
         transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         transform.position = new Vector2(transform.position.x, transform.position.y);
     }
 
-    public void enableDragSprite(Sprite sprite)
+    public void EnableDragSprite(Sprite sprite)
     {
         spriteRenderer.enabled = true;
         spriteRenderer.sprite = sprite; //Set sprite to the one we passed in the parameter
         spriteRenderer.sortingOrder = 10;
     }
 
-    public void disableDragSprite()
+    public void DisableDragSprite()
     {
         spriteRenderer.enabled = false;
     }
