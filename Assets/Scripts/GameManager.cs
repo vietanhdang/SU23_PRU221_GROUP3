@@ -7,7 +7,8 @@ public enum gameStatus
 {
     next, play, gameover, win
 }
-public class GameManager : Singleton<GameManager> {
+public class GameManager : Singleton<GameManager>
+{
     //SerializeField - Allows Inspector to get access to private fields.
     //If we want to get access to this from another class, we'll just need to make public getters
     [SerializeField]
@@ -30,6 +31,8 @@ public class GameManager : Singleton<GameManager> {
     private Text playButtonLabel;
     [SerializeField]
     private Button playButton;
+
+    public float[] enemySpawnRates = new float[] { 0.7f, 0.2f, 0.1f };
 
     private int waveNumber = 0;
     private int totalMoney = 25;
@@ -72,9 +75,10 @@ public class GameManager : Singleton<GameManager> {
     {
         get { return audioSource; }
     }
-    
+
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         playButton.gameObject.SetActive(false);
         audioSource = GetComponent<AudioSource>();
         ShowMenu();
@@ -129,9 +133,12 @@ public class GameManager : Singleton<GameManager> {
     ///Destroy - At the end of the wave
     public void DestroyAllEnemies()
     {
-        foreach(Enemy enemy in EnemyList)
+        foreach (Enemy enemy in EnemyList)
         {
-            Destroy(enemy.gameObject);
+            if(enemy != null)
+            {
+				Destroy(enemy.gameObject);
+			}
         }
         EnemyList.Clear();
     }
@@ -151,7 +158,7 @@ public class GameManager : Singleton<GameManager> {
         totalEscapedLabel.text = "Escaped " + TotalEscape + "/10";
         if (RoundEscaped + TotalKilled == totalEnemies)
         {
-            if(waveNumber <= enemies.Length)
+            if (waveNumber <= enemies.Length)
             {
                 enemiesToSpawn = waveNumber;
             }
@@ -162,11 +169,11 @@ public class GameManager : Singleton<GameManager> {
 
     public void SetCurrentGameState()
     {
-        if(totalEscaped >= 10)
+        if (totalEscaped >= 10)
         {
             currentState = gameStatus.gameover;
         }
-        else if(waveNumber == 0 && (TotalKilled + RoundEscaped) == 0)
+        else if (waveNumber == 0 && (TotalKilled + RoundEscaped) == 0)
         {
             currentState = gameStatus.play;
         }
@@ -214,8 +221,8 @@ public class GameManager : Singleton<GameManager> {
                 break;
         }
         DestroyAllEnemies();
-		//TowerManager.Instance.DestroyAllTower();
-		TotalKilled = 0;
+        //TowerManager.Instance.DestroyAllTower();
+        TotalKilled = 0;
         RoundEscaped = 0;
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
         StartCoroutine(Spawn());
