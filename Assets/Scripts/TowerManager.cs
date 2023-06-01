@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Linq;
+
+public enum TowerLevel
+{
+    level1, level2, level3, levelMax
+}
 
 public class TowerManager : Singleton<TowerManager>
 {
@@ -9,6 +15,9 @@ public class TowerManager : Singleton<TowerManager>
     private List<Tower> TowerList = new List<Tower>();
     private List<Collider2D> BuildList = new List<Collider2D>();
     private Collider2D buildTile;
+    private Dictionary<Collider2D, int> buildTileAndIndexOfTower = new Dictionary<Collider2D, int>();
+    private Dictionary<Tower, int> towerAndIndexOfTower = new Dictionary<Tower, int>();
+    private int indexOfTower;
 
     // Use this for initialization
     void Start()
@@ -16,6 +25,7 @@ public class TowerManager : Singleton<TowerManager>
         spriteRenderer = GetComponent<SpriteRenderer>();
         buildTile = GetComponent<Collider2D>();
         spriteRenderer.enabled = false;
+        indexOfTower = 1;
     }
 
     // Update is called once per frame
@@ -41,6 +51,14 @@ public class TowerManager : Singleton<TowerManager>
                 RegisterBuildSite(buildTile);
                 PlaceTower(hit);
             }
+
+            if (hit.collider.tag == "buildSiteFull")
+            {
+                GameObject hitObject = hit.collider.gameObject;
+                int index = buildTileAndIndexOfTower.FirstOrDefault(x => x.Key.Equals(hitObject)).Value;
+                Debug.Log(index);
+                // Do something with the hit object...
+            }
         }
 
         //When we have a sprite enabled, have it follow the mouse (I.E - Placing a Tower)
@@ -53,30 +71,33 @@ public class TowerManager : Singleton<TowerManager>
 
     public void RegisterBuildSite(Collider2D buildTag)
     {
-        BuildList.Add(buildTag);
+        //BuildList.Add(buildTag);
+        buildTileAndIndexOfTower.Add(buildTag, indexOfTower);
+        indexOfTower++;
     }
 
     public void RegisterTower(Tower tower)
     {
-        TowerList.Add(tower);
+        //TowerList.Add(tower);
+        towerAndIndexOfTower.Add(tower, indexOfTower);
     }
 
     public void RenameTagsBuildSites()
     {
-        foreach (Collider2D buildTag in BuildList)
+        foreach (Collider2D buildTag in buildTileAndIndexOfTower.Keys)
         {
             buildTag.tag = "buildSite";
         }
-        BuildList.Clear();
+        buildTileAndIndexOfTower.Clear();
     }
 
     public void DestroyAllTower()
     {
-        foreach (Tower tower in TowerList)
+        foreach (Tower tower in towerAndIndexOfTower.Keys)
         {
             Destroy(tower.gameObject);
         }
-        TowerList.Clear();
+        towerAndIndexOfTower.Clear();
     }
 
     //Place new tower on the mouse click location
