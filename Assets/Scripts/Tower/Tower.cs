@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour {
 
-    
     public float TimeBetweenAttacks{ get; set; }    //AKA - Attack Speed
     
     public float AttackRange { get; set; }      //AKA - Attack Radius
     [SerializeField]
-    protected Projectile projectile;      //Type of Projectile
+    public Projectile projectile;      //Type of Projectile
     protected Enemy targetEnemy = null;
     protected bool isAttacking = false;
+	public bool isSelected = false;
+	public bool firstPlace = true;
+    public int level = 1;
 
-    public TowerLevel towerLevel = TowerLevel.level1;
 
 	Timer timer;
     protected  void Init(float timeBetweenAttacks, float attackRange)
@@ -30,6 +31,7 @@ public class Tower : MonoBehaviour {
 
     // Update is called once per frame
     public virtual void Update () {
+        timer.Duration = TimeBetweenAttacks;
         //If our closest enemy in range and if its within our attackRange, set our target enemy to the closest enemy in range.
         if (targetEnemy == null || targetEnemy.IsDead)
         {

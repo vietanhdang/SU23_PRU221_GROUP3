@@ -3,11 +3,7 @@ using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-
-public enum TowerLevel
-{
-	level1, level2, level3, levelMax
-}
+using UnityEngine.UI;
 
 public class TowerManager : Singleton<TowerManager>
 {
@@ -20,7 +16,9 @@ public class TowerManager : Singleton<TowerManager>
 	private Dictionary<int, Tower> towerAndIndexOfTower = new Dictionary<int, Tower>();
 	private int indexOfTower;
 	private Collider2D hitObject;
-
+	private GameObject buttonUpgrade;
+	private int selectedIndex;
+	Text levelDisplay;
 	// Use this for initialization
 	void Start()
 	{
@@ -29,6 +27,9 @@ public class TowerManager : Singleton<TowerManager>
 		hitObject = GetComponent<Collider2D>();
 		spriteRenderer.enabled = false;
 		indexOfTower = 1;
+		buttonUpgrade = GameObject.FindGameObjectWithTag("buttonUpgrade");
+		buttonUpgrade.SetActive(false);
+		
 	}
 
 	// Update is called once per frame
@@ -58,33 +59,37 @@ public class TowerManager : Singleton<TowerManager>
 
 			try
 			{
+
 				if (hit.collider.tag == "buildSiteFull")
 				{
 					hitObject = hit.collider;
 					int index = buildTileAndIndexOfTower.FirstOrDefault(x => x.Key.Equals(hitObject)).Value;
+					selectedIndex = index;
 					Tower tower = towerAndIndexOfTower[index];
-					if (tower.towerLevel == TowerLevel.level1)
+					if (!tower.isSelected)
 					{
-						Debug.Log("Level1");
-						tower.towerLevel = TowerLevel.level2;
+						tower.isSelected = true;
+						if (!tower.firstPlace)
+						{
+							Vector3 selectedTower = tower.gameObject.transform.position;
+							selectedTower.y -= 0.2f;
+							towerAndIndexOfTower[index].gameObject.transform.position = selectedTower;
+							buttonUpgrade.SetActive(false);
+						}
 					}
-					else if (tower.towerLevel == TowerLevel.level2)
+					else if (tower.isSelected)
 					{
-						Debug.Log("Level2");
-						tower.towerLevel = TowerLevel.level3;
+						Vector3 selectedTower = tower.gameObject.transform.position;
+						selectedTower.y += 0.2f;
+						towerAndIndexOfTower[index].gameObject.transform.position = selectedTower;
+						tower.isSelected = false;
+						tower.firstPlace = false;
+						buttonUpgrade.SetActive(true);
 					}
-					else if (tower.towerLevel == TowerLevel.level3)
-					{
-						Debug.Log("Level3");
-						tower.towerLevel = TowerLevel.levelMax;
-					}
-					else
-					{
-						Debug.Log("Max");
-					}
-					towerAndIndexOfTower[index] = tower;
+					levelDisplay.text = "LV" + tower.level;
 				}
-			} catch (Exception ex)
+			}
+			catch (Exception ex)
 			{
 
 			}
@@ -97,6 +102,30 @@ public class TowerManager : Singleton<TowerManager>
 		}
 	}
 
+	public void ClickUpgrade()
+	{
+		Tower tower = towerAndIndexOfTower[selectedIndex];
+		levelDisplay = GameObject.FindWithTag("upgradePrice").GetComponent<Text>();
+		if (tower.level < 3 && GameManager.Instance.TotalMoney >= 10)
+		{
+			GameManager.Instance.TotalMoney -= 10;
+			tower.AttackRange *= 1.2f;
+			tower.TimeBetweenAttacks -= tower.TimeBetweenAttacks * 0.2f;
+			Debug.Log("index: " + selectedIndex + ", attack range: " + tower.AttackRange + ", time: " + tower.TimeBetweenAttacks);
+			tower.level += 1;
+			levelDisplay.text = "LV" + tower.level;
+		}
+		else if (tower.level >= 3)
+		{
+			levelDisplay.text = "Max";
+		}
+		else if (GameManager.Instance.TotalMoney < 10)
+		{
+			levelDisplay.text = "$";
+		}
+		towerAndIndexOfTower[selectedIndex] = tower;
+
+	}
 
 	public void RegisterBuildSite(Collider2D buildTag)
 	{

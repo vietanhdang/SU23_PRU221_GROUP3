@@ -16,7 +16,7 @@ public class Projectile : MonoBehaviour {
     [SerializeField]
     private ProjectileType projectileType;
 
-    public int AttackStrength
+	public int AttackStrength
     {
         get { return attackStrength; }
     }
@@ -28,6 +28,6 @@ public class Projectile : MonoBehaviour {
 
     private void Update()
     {
-        Destroy(gameObject, 5);
+        Destroy(gameObject, 3);
     }
 }
