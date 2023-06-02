@@ -1,18 +1,17 @@
-﻿using System.Collections;
+﻿using Assets.Scripts.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public enum gameStatus
 {
-    next, play, gameover, win
+    next, play, gameover, continueGame, pause, start, playAgain
 }
 public class GameManager : Singleton<GameManager>
 {
     //SerializeField - Allows Inspector to get access to private fields.
     //If we want to get access to this from another class, we'll just need to make public getters
-    [SerializeField]
-    private int totalWaves = 10;
     [SerializeField]
     private Text totalMoneyLabel;   //Refers to money label at upper left corner
     [SerializeField]
@@ -31,6 +30,11 @@ public class GameManager : Singleton<GameManager>
     private Text playButtonLabel;
     [SerializeField]
     private Button playButton;
+
+    [SerializeField]
+    private Text continueButtonLabel;
+    [SerializeField]
+    private Button continueButton;
 
     public float[] enemySpawnRates = new float[] { 0.7f, 0.2f, 0.1f };
 
@@ -76,18 +80,61 @@ public class GameManager : Singleton<GameManager>
         get { return audioSource; }
     }
 
+    private FileIOManager fileIOManager;
+    private GameObject towerPanel;
+    public GameObject TowerPanel
+    {
+        get { return towerPanel; }
+        set { towerPanel = value; }
+    }
+
+    private GameData gameData;
+
+    public GameData GameData
+    {
+        get { return gameData; }
+    }
+
     // Use this for initialization
     void Start()
     {
         playButton.gameObject.SetActive(false);
+        continueButton.gameObject.SetActive(false);
+        fileIOManager = gameObject.AddComponent<FileIOManager>();
+        TowerPanel = GameObject.FindWithTag("towerPanel");
+        TowerPanel?.SetActive(false);
         audioSource = GetComponent<AudioSource>();
         ShowMenu();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    private void LoadGameData()
+    {
+        gameData = fileIOManager.LoadGameData();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveGameData();
+    }
+    private void SaveGameData()
+    {
+        // TODO: Save game data
+        GameData gameData = new GameData
+        {
+            waveNumber = waveNumber,
+            totalMoney = totalMoney,
+            totalEscaped = totalEscaped,
+            roundEscaped = roundEscaped,
+            totalKilled = totalKilled
+        };
+        fileIOManager.SaveGame(gameData);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         HandleEscape();
-	}
+    }
 
     IEnumerator Spawn()
     {
@@ -135,10 +182,10 @@ public class GameManager : Singleton<GameManager>
     {
         foreach (Enemy enemy in EnemyList)
         {
-            if(enemy != null)
+            if (enemy != null)
             {
-				Destroy(enemy.gameObject);
-			}
+                Destroy(enemy.gameObject);
+            }
         }
         EnemyList.Clear();
     }
@@ -202,34 +249,76 @@ public class GameManager : Singleton<GameManager>
     }
     public void playButtonPressed()
     {
-        Debug.Log("Play Button Pressed");
         switch (currentState)
         {
             case gameStatus.next:
                 waveNumber += 1;
                 totalEnemies += waveNumber;
                 break;
-            default:
-                totalEnemies = 3;
-                totalEscaped = 0;
-                //TotalMoney = 20;
-                //TowerManager.Instance.DestroyAllTower();
-                TowerManager.Instance.RenameTagsBuildSites();
-                totalMoneyLabel.text = TotalMoney.ToString();
-                totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
-                AudioSource.PlayOneShot(SoundManager.Instance.NewGame);
-                break;
+            case gameStatus.start:
+                currentState = gameStatus.pause;
+                Time.timeScale = 0;
+                playButtonLabel.text = "Continue";
+                continueButton.gameObject.SetActive(true);
+                continueButtonLabel.text = "New Game";
+                TowerManager.Instance.IsPreventCreateTower = true;
+                return;
+            case gameStatus.pause:
+                currentState = gameStatus.start;
+                Time.timeScale = 1;
+                playButtonLabel.text = "Pause";
+                continueButton.gameObject.SetActive(false);
+                TowerManager.Instance.IsPreventCreateTower = false;
+                return;
         }
+        AudioSource.PlayOneShot(SoundManager.Instance.NewGame);
+        // if current state is not playAgain, set default value for game
+        if (currentState != gameStatus.playAgain)
+        {
+            setDefaultGameValue();
+        }
+        TowerPanel?.SetActive(true);
+        StartCoroutine(Spawn());
+        Time.timeScale = 1;
+        playButtonLabel.text = "Pause";
+        currentState = gameStatus.start;
+        TowerManager.Instance.IsPreventCreateTower = false;
+    }
+
+    // set default value for game
+    private void setDefaultGameValue()
+    {
+        waveNumber = 0;
+        totalEnemies = 3;
+        totalEscaped = 0;
+        TotalMoney = 25;
+        whichEnemiesToSpawn = 0;
+        enemiesToSpawn = 0;
+        TowerManager.Instance.RenameTagsBuildSites();
+        totalMoneyLabel.text = TotalMoney.ToString();
+        totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
         DestroyAllEnemies();
-        //TowerManager.Instance.DestroyAllTower();
+        TowerManager.Instance.DestroyAllTower();
         TotalKilled = 0;
         RoundEscaped = 0;
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
-        StartCoroutine(Spawn());
-        playButton.gameObject.SetActive(false);
+        currentState = gameStatus.play;
+        ShowMenu();
+        TowerPanel?.SetActive(false);
+    }
+
+    public void continueButtonPressed()
+    {
+        if (currentState == gameStatus.pause)
+        {
+            setDefaultGameValue();
+            continueButton.gameObject.SetActive(false);
+            currentState = gameStatus.playAgain;
+        }
     }
     private void HandleEscape()
     {
+        // pause game if escape key is pressed
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             TowerManager.Instance.DisableDragSprite();
