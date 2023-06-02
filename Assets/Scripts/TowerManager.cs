@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine.UI;
+using System.Reflection;
 
 public class TowerManager : Singleton<TowerManager>
 {
@@ -17,6 +18,7 @@ public class TowerManager : Singleton<TowerManager>
 	private int indexOfTower;
 	private Collider2D hitObject;
 	private GameObject buttonUpgrade;
+	private GameObject buttonRemoveTower;
 	private int selectedIndex;
 	Text levelDisplay;
 	// Use this for initialization
@@ -29,7 +31,9 @@ public class TowerManager : Singleton<TowerManager>
 		indexOfTower = 1;
 		buttonUpgrade = GameObject.FindGameObjectWithTag("buttonUpgrade");
 		buttonUpgrade.SetActive(false);
-		
+		buttonRemoveTower = GameObject.FindGameObjectWithTag("removeTower");
+		buttonRemoveTower.SetActive(false);
+
 	}
 
 	// Update is called once per frame
@@ -52,7 +56,15 @@ public class TowerManager : Singleton<TowerManager>
 			{
 				buildTile = hit.collider;
 				buildTile.tag = "buildSiteFull";     //This prevents us from stacking towers ontop of each other.
-				RegisterBuildSite(buildTile);
+				if (buildTileAndIndexOfTower.ContainsKey(buildTile))
+				{
+					buildTileAndIndexOfTower[buildTile] = indexOfTower;
+				}
+				else
+				{
+					RegisterBuildSite(buildTile);
+
+				}
 				PlaceTower(hit);
 				indexOfTower++;
 			}
@@ -75,6 +87,7 @@ public class TowerManager : Singleton<TowerManager>
 							selectedTower.y -= 0.2f;
 							towerAndIndexOfTower[index].gameObject.transform.position = selectedTower;
 							buttonUpgrade.SetActive(false);
+							buttonRemoveTower.SetActive(false);
 						}
 					}
 					else if (tower.isSelected)
@@ -85,14 +98,34 @@ public class TowerManager : Singleton<TowerManager>
 						tower.isSelected = false;
 						tower.firstPlace = false;
 						buttonUpgrade.SetActive(true);
+						buttonRemoveTower.SetActive(true);
 					}
 					levelDisplay.text = "LV" + tower.level;
 				}
+				//else if (hit.collider.tag != "buttonUpgrade" && hit.collider.tag != "removeTower")
+				//{
+				//	Tower tower = towerAndIndexOfTower[selectedIndex];
+				//	if (!tower.isSelected)
+				//	{
+				//		tower.isSelected = true;
+				//		if (!tower.firstPlace)
+				//		{
+				//			Vector3 selectedTower = tower.gameObject.transform.position;
+				//			selectedTower.y -= 0.2f;
+				//			towerAndIndexOfTower[selectedIndex].gameObject.transform.position = selectedTower;
+				//			buttonUpgrade.SetActive(false);
+				//			buttonRemoveTower.SetActive(false);
+				//		}
+				//	}
+				//}
+
 			}
 			catch (Exception ex)
 			{
 
 			}
+
+
 		}
 
 		//When we have a sprite enabled, have it follow the mouse (I.E - Placing a Tower)
@@ -124,7 +157,15 @@ public class TowerManager : Singleton<TowerManager>
 			levelDisplay.text = "$";
 		}
 		towerAndIndexOfTower[selectedIndex] = tower;
+	}
 
+	public void ClickRemoveTower()
+	{
+		Destroy(towerAndIndexOfTower[selectedIndex].gameObject);
+		buildTileAndIndexOfTower.FirstOrDefault(x => x.Value == selectedIndex).Key.tag = "buildSite";
+		towerAndIndexOfTower.Remove(selectedIndex);
+		buttonUpgrade.SetActive(false);
+		buttonRemoveTower.SetActive(false);
 	}
 
 	public void RegisterBuildSite(Collider2D buildTag)
@@ -172,6 +213,7 @@ public class TowerManager : Singleton<TowerManager>
 			DisableDragSprite();
 		}
 	}
+
 	public void BuyTower(int price)
 	{
 		GameManager.Instance.SubtractMoney(price);
