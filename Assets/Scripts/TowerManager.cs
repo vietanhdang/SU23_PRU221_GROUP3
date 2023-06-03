@@ -121,8 +121,8 @@ public class TowerManager : Singleton<TowerManager>
                 selectedIndex = index;
             }
 
-            // Click outside of tower then deselect all towers selected
-            if (hit.collider.tag != "buildSiteFull" && hit.collider.tag != "buildSite")
+            // Click outside of tower (to ground) then deselect all towers selected
+            if (selectedIndex != 0 && hit.collider.tag == "ground")
             {
                 foreach (Tower otherTower in towerAndIndexOfTower.Values)
                 {
@@ -152,6 +152,8 @@ public class TowerManager : Singleton<TowerManager>
     {
         if (IsPreventCreateTower) return;
         Tower tower;
+        // add tag to the button upgrade 
+        this.gameObject.tag = "upgrade";
         towerAndIndexOfTower.TryGetValue(selectedIndex, out tower);
         if (tower == null) return;
         levelDisplay = GameObject.FindWithTag("upgradePrice").GetComponent<Text>();
