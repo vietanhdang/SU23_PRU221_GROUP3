@@ -34,6 +34,18 @@ namespace Assets.Scripts.IO
             }
         }
 
+        public GameData LoadDefaultGameData()
+        {
+            string data = File.ReadAllText("Assets/Scripts/IO/defaultData.json");
+            if (data == null)
+            {
+                Debug.LogError("File doesn't exist.");
+                return null;
+            }
+            GameData gameData = JsonConvert.DeserializeObject<GameData>(data);
+            return gameData;
+        }
+
         public void SaveGame(GameData gameData)
         {
             filePath = Application.persistentDataPath + "/data.json";
