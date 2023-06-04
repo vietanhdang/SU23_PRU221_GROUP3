@@ -1,0 +1,14 @@
+{
+  "waveNumber": 1,
+  "totalMoney": 25,
+  "totalEscaped": 0,
+  "roundEscaped": 0,
+  "totalKilled": 2,
+  "whichEnemiesToSpawn": 2,
+  "enemiesToSpawn": 0,
+  "currentState": 4,
+  "totalEnemies": 4,
+  "enemiesPerSpawn": 1,
+  "spawnDelay": 1.5,
+  "enemySpawnRates": [0.7, 0.2, 0.1]
+}

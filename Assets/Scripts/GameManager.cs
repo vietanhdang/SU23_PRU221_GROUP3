@@ -105,8 +105,19 @@ public class GameManager : Singleton<GameManager>
         TowerPanel = GameObject.FindWithTag("towerPanel");
         TowerPanel?.SetActive(false);
         audioSource = GetComponent<AudioSource>();
+        LoadDefaultGameData();
         LoadGameData();
         ShowMenu();
+    }
+
+    private void LoadDefaultGameData()
+    {
+        gameData = fileIOManager.LoadDefaultGameData();
+        if (gameData == null)
+        {
+            return;
+        }
+        totalMoney = gameData.totalMoney;
     }
 
     private void LoadGameData()
@@ -326,6 +337,8 @@ public class GameManager : Singleton<GameManager>
             DestroyAllEnemies();
             TotalKilled = 0;
             RoundEscaped = 0;
+            // override default value
+            LoadDefaultGameData();
         }
 
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
