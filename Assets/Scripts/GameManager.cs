@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,18 +39,18 @@ public class GameManager : Singleton<GameManager>
 
     public float[] enemySpawnRates = new float[] { 0.7f, 0.2f, 0.1f };
 
-    private int waveNumber = 0;
-    private int totalMoney = 25;
-    private int totalEscaped = 0;
-    private int roundEscaped = 0;
-    private int totalKilled = 0;
-    private int whichEnemiesToSpawn = 0;
-    private int enemiesToSpawn = 0;
+    private int waveNumber = 0; // số lượng wave
+    private int totalMoney = 25; // số tiền ban đầu
+    private int totalEscaped = 0; // số lượng enemy đã thoát trong tất cả các wave
+    private int roundEscaped = 0; // số lượng enemy đã thoát trong wave hiện tại
+    private int totalKilled = 0; // số lượng enemy đã bị giết trong wave hiện tại
+    private int whichEnemiesToSpawn = 0; // số lượng enemy còn lại trong wave hiện tại
+    private int enemiesToSpawn = 0; // số lượng enemy cần spawn trong wave hiện tại
     private gameStatus currentState = gameStatus.play;
     private AudioSource audioSource;
 
     public List<Enemy> EnemyList = new List<Enemy>();
-    const float spawnDelay = 1.5f; //Spawn Delay in seconds
+    private float spawnDelay = 1.5f; //Spawn Delay in seconds
     public int TotalMoney
     {
         get { return totalMoney; }
@@ -104,12 +105,19 @@ public class GameManager : Singleton<GameManager>
         TowerPanel = GameObject.FindWithTag("towerPanel");
         TowerPanel?.SetActive(false);
         audioSource = GetComponent<AudioSource>();
+        LoadGameData();
         ShowMenu();
     }
 
     private void LoadGameData()
     {
         gameData = fileIOManager.LoadGameData();
+        if (gameData == null)
+        {
+            return;
+        }
+        continueButton.gameObject.SetActive(true);
+        continueButtonLabel.text = "Continue Last Game";
     }
 
     private void OnApplicationQuit()
@@ -118,22 +126,23 @@ public class GameManager : Singleton<GameManager>
     }
     private void SaveGameData()
     {
-        // TODO: Save game data
+
         GameData gameData = new GameData
         {
             waveNumber = waveNumber,
-            totalMoney = totalMoney,
-            totalEscaped = totalEscaped,
-            roundEscaped = roundEscaped,
-            totalKilled = totalKilled
+            totalMoney = TotalMoney,
+            totalEscaped = TotalEscape,
+            roundEscaped = RoundEscaped,
+            totalKilled = TotalKilled,
+            whichEnemiesToSpawn = whichEnemiesToSpawn,
+            enemiesToSpawn = enemiesToSpawn,
+            currentState = currentState,
+            totalEnemies = totalEnemies,
+            enemiesPerSpawn = enemiesPerSpawn,
+            spawnDelay = spawnDelay,
+            enemySpawnRates = enemySpawnRates,
         };
         fileIOManager.SaveGame(gameData);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        HandleEscape();
     }
 
     IEnumerator Spawn()
@@ -270,13 +279,21 @@ public class GameManager : Singleton<GameManager>
                 continueButton.gameObject.SetActive(false);
                 TowerManager.Instance.IsPreventCreateTower = false;
                 return;
+            default:
+                totalEnemies = 3;
+                totalEscaped = 0;
+                TowerManager.Instance.RenameTagsBuildSites();
+                totalMoneyLabel.text = TotalMoney.ToString();
+                totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
+                break;
         }
         AudioSource.PlayOneShot(SoundManager.Instance.NewGame);
         // if current state is not playAgain, set default value for game
         if (currentState != gameStatus.playAgain)
         {
-            setDefaultGameValue();
+            setDefaultGameValue(isDefault: false);
         }
+        continueButton.gameObject.SetActive(false);
         TowerPanel?.SetActive(true);
         StartCoroutine(Spawn());
         Time.timeScale = 1;
@@ -284,29 +301,37 @@ public class GameManager : Singleton<GameManager>
         currentState = gameStatus.start;
         TowerManager.Instance.IsPreventCreateTower = false;
     }
-
     // set default value for game
-    private void setDefaultGameValue()
+    private void setDefaultGameValue(bool isDefault = true, int status = 0)
     {
-        waveNumber = 0;
-        totalEnemies = 3;
-        totalEscaped = 0;
-        TotalMoney = 25;
-        whichEnemiesToSpawn = 0;
-        enemiesToSpawn = 0;
-        TowerManager.Instance.RenameTagsBuildSites();
-        totalMoneyLabel.text = TotalMoney.ToString();
-        totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
-        DestroyAllEnemies();
-        TowerManager.Instance.DestroyAllTower();
-        TotalKilled = 0;
-        RoundEscaped = 0;
+        if (status == (int)gameStatus.continueGame)
+        {
+            totalMoneyLabel.text = TotalMoney.ToString();
+            totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
+        }
+        else
+        {
+            if (isDefault)
+            {
+                TotalMoney = 25;
+                totalEnemies = 3;
+                totalEscaped = 0;
+                TowerManager.Instance.RenameTagsBuildSites();
+                TowerManager.Instance.DestroyAllTower();
+                TowerPanel?.SetActive(false);
+                waveNumber = 0;
+                totalMoneyLabel.text = TotalMoney.ToString();
+                totalEscapedLabel.text = "Escaped " + totalEscaped + "/10";
+            }
+            DestroyAllEnemies();
+            TotalKilled = 0;
+            RoundEscaped = 0;
+        }
+
         currentWaveLabel.text = "Wave " + (waveNumber + 1);
         currentState = gameStatus.play;
         ShowMenu();
-        TowerPanel?.SetActive(false);
     }
-
     public void continueButtonPressed()
     {
         if (currentState == gameStatus.pause)
@@ -315,15 +340,24 @@ public class GameManager : Singleton<GameManager>
             continueButton.gameObject.SetActive(false);
             currentState = gameStatus.playAgain;
         }
-    }
-    private void HandleEscape()
-    {
-        // pause game if escape key is pressed
-        if (Input.GetKeyDown(KeyCode.Escape))
+        else
         {
-            TowerManager.Instance.DisableDragSprite();
-            TowerManager.Instance.towerButtonPressed = null;
+            waveNumber = gameData.waveNumber;
+            totalMoney = gameData.totalMoney;
+            totalEscaped = gameData.totalEscaped;
+            roundEscaped = gameData.roundEscaped;
+            totalKilled = gameData.totalKilled;
+            whichEnemiesToSpawn = gameData.whichEnemiesToSpawn;
+            enemiesToSpawn = gameData.enemiesToSpawn;
+            currentState = gameData.currentState;
+            totalEnemies = gameData.totalEnemies;
+            enemiesPerSpawn = gameData.enemiesPerSpawn;
+            spawnDelay = gameData.spawnDelay;
+            enemySpawnRates = gameData.enemySpawnRates;
+            setDefaultGameValue(isDefault: false, status: (int)gameStatus.continueGame);
+            StartCoroutine(Spawn());
+            continueButton.gameObject.SetActive(false);
+            currentState = gameStatus.play;
         }
     }
-
 }

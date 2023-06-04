@@ -36,8 +36,13 @@ namespace Assets.Scripts.IO
 
         public void SaveGame(GameData gameData)
         {
-            string json = JsonConvert.SerializeObject(gameData);
-            File.WriteAllText(filePath, json);
+            filePath = Application.persistentDataPath + "/data.json";
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath).Dispose();
+            }
+            string data = JsonConvert.SerializeObject(gameData);
+            File.WriteAllText(filePath, data);
         }
 
         public void DeleteFile()
