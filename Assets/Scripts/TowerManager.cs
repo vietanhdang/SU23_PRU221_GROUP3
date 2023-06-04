@@ -152,8 +152,6 @@ public class TowerManager : Singleton<TowerManager>
     {
         if (IsPreventCreateTower) return;
         Tower tower;
-        // add tag to the button upgrade 
-        this.gameObject.tag = "upgrade";
         towerAndIndexOfTower.TryGetValue(selectedIndex, out tower);
         if (tower == null) return;
         levelDisplay = GameObject.FindWithTag("upgradePrice").GetComponent<Text>();

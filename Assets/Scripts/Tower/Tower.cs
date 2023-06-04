@@ -2,52 +2,55 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tower : MonoBehaviour {
+public class Tower : MonoBehaviour
+{
 
-    public float TimeBetweenAttacks{ get; set; }    //AKA - Attack Speed
-    
+    public float TimeBetweenAttacks { get; set; }    //AKA - Attack Speed
+
     public float AttackRange { get; set; }      //AKA - Attack Radius
     [SerializeField]
     public Projectile projectile;      //Type of Projectile
     protected Enemy targetEnemy = null;
     protected bool isAttacking = false;
-	public bool isSelected = false;
-	public bool firstPlace = true;
+    public bool isSelected = false;
+    public bool firstPlace = true;
     public int level = 1;
 
 
-	Timer timer;
-    protected  void Init(float timeBetweenAttacks, float attackRange)
+    Timer timer;
+    protected void Init(float timeBetweenAttacks, float attackRange)
     {
         TimeBetweenAttacks = timeBetweenAttacks;
         AttackRange = attackRange;
     }
-	// Use this for initialization
-	  public virtual void Start () {
-		timer = gameObject.AddComponent<Timer>();
-		timer.Duration = TimeBetweenAttacks;
-		timer.Run();
-	}
+    // Use this for initialization
+    public virtual void Start()
+    {
+        timer = gameObject.AddComponent<Timer>();
+        timer.Duration = TimeBetweenAttacks;
+        timer.Run();
+    }
 
     // Update is called once per frame
-    public virtual void Update () {
+    public virtual void Update()
+    {
         timer.Duration = TimeBetweenAttacks;
         //If our closest enemy in range and if its within our attackRange, set our target enemy to the closest enemy in range.
         if (targetEnemy == null || targetEnemy.IsDead)
         {
             Enemy closestEnemy = GetClosestEnemyInRange();
-            if(closestEnemy != null && Vector2.Distance(transform.localPosition, closestEnemy.transform.position) <= AttackRange)
+            if (closestEnemy != null && Vector2.Distance(transform.localPosition, closestEnemy.transform.position) <= AttackRange)
             {
                 targetEnemy = closestEnemy;
             }
         }
         else
         {
-            if(timer.Finished && isAttacking == true)
+            if (timer.Finished && isAttacking == true)
             {
                 Attack();
-				timer.Run();
-			}
+                timer.Run();
+            }
             else
             {
                 isAttacking = true;
@@ -59,7 +62,7 @@ public class Tower : MonoBehaviour {
             }
         }
 
-	}
+    }
 
     public virtual void Attack()
     {
@@ -67,18 +70,20 @@ public class Tower : MonoBehaviour {
         Projectile newProjectile = Instantiate(projectile) as Projectile;
         newProjectile.transform.localPosition = transform.position;
 
-        if(newProjectile.ProjectileType == ProjectileType.arrow)
+        if (newProjectile.ProjectileType == ProjectileType.arrow)
         {
             GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Arrow);
-        } else if(newProjectile.ProjectileType == ProjectileType.fireball)
+        }
+        else if (newProjectile.ProjectileType == ProjectileType.fireball)
         {
             GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Fireball);
-        } else if (newProjectile.ProjectileType == ProjectileType.rock)
+        }
+        else if (newProjectile.ProjectileType == ProjectileType.rock)
         {
             GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Rock);
         }
         //If we have a target enemy, start a coroutine to shoot projectile to target enemy
-        if(targetEnemy == null)
+        if (targetEnemy == null)
         {
             Destroy(newProjectile);
         }
@@ -91,7 +96,7 @@ public class Tower : MonoBehaviour {
     ///Move Projectile to Target Enemy
     IEnumerator MoveProjectile(Projectile projectile)
     {
-        while(getTargetDistance(targetEnemy) > 0.20f && projectile != null && targetEnemy != null)
+        while (getTargetDistance(targetEnemy) > 0.20f && projectile != null && targetEnemy != null)
         {
             if (targetEnemy == null || targetEnemy.IsDead)
             {
@@ -114,10 +119,10 @@ public class Tower : MonoBehaviour {
     protected float getTargetDistance(Enemy enemy)
 
     {
-        if(enemy == null)
+        if (enemy == null)
         {
             enemy = GetClosestEnemyInRange();
-            if(enemy == null)
+            if (enemy == null)
             {
                 return 0f;
             }
@@ -128,15 +133,14 @@ public class Tower : MonoBehaviour {
     protected List<Enemy> GetEnemiesInRange()
     {
         List<Enemy> enemiesInRange = new List<Enemy>();
-
-        //Check if enemies are in range
-        foreach(Enemy enemy in GameManager.Instance.EnemyList)
+        if (GameManager.Instance == null || GameManager.Instance.EnemyList == null)
         {
-
-          
-
-            if(enemy != null && Vector2.Distance(transform.localPosition, enemy.transform.localPosition) <= AttackRange && !enemy.IsDead)
-
+            return enemiesInRange;
+        }
+        //Check if enemies are in range
+        foreach (Enemy enemy in GameManager.Instance.EnemyList)
+        {
+            if (enemy != null && Vector2.Distance(transform.localPosition, enemy.transform.localPosition) <= AttackRange && !enemy.IsDead)
             {
                 enemiesInRange.Add(enemy);
             }
@@ -147,11 +151,10 @@ public class Tower : MonoBehaviour {
     protected Enemy GetClosestEnemyInRange()
     {
         Enemy closestEnemy = null;
-        float smallestDistance = float.PositiveInfinity; 
-
-        foreach(Enemy enemy in GetEnemiesInRange())
+        float smallestDistance = float.PositiveInfinity;
+        foreach (Enemy enemy in GetEnemiesInRange())
         {
-            if(Vector2.Distance(transform.localPosition, enemy.transform.localPosition) < smallestDistance)
+            if (Vector2.Distance(transform.localPosition, enemy.transform.localPosition) < smallestDistance)
             {
                 smallestDistance = Vector2.Distance(transform.localPosition, enemy.transform.localPosition);
                 closestEnemy = enemy;
