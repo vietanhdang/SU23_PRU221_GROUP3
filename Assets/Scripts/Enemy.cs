@@ -1,120 +1,131 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-	//SerializeField - Allows Inspector to get access to private fields.
-	//If we want to get access to this from another class, we'll just need to make public getters
-	[SerializeField]
-	private Transform exitPoint;
-	[SerializeField]
-	private Transform[] wayPoints;
-	[SerializeField]
-	private float navigationUpdate;
-	[SerializeField]
-	private int healthPoints;
-	[SerializeField]
-	private int rewardAmount;
+    [SerializeField]
+    private Transform exitPoint; // Điểm cuối của enemy
+    [SerializeField]
+    private Transform[] wayPoints; // Mảng các điểm đến của enemy
+    [SerializeField]
+    private float navigationUpdate; // Tốc độ di chuyển của enemy
+    [SerializeField]
+    private int healthPoints; // Máu của enemy
+    [SerializeField]
+    private int rewardAmount; // Số tiền nhận được khi giết enemy
 
-	private int target = 0;
-	private Transform enemy;
-	private Collider2D enemyCollider;
-	private Animator anim;
-	private float navigationTime = 0;
-	private bool isDead = false;
+    private int target = 0; // Điểm đến của enemy
+    private Transform enemy; // Transform của enemy
+    private Collider2D enemyCollider; // Collider của enemy
+    private Animator anim; // Animator của enemy
+    private float navigationTime = 0; // Thời gian di chuyển của enemy
+    private bool isDead = false; // Kiểm tra enemy đã chết hay chưa
 
-	public bool IsDead
-	{
-		get { return isDead; }
-	}
+    public bool IsDead
+    {
+        get { return isDead; }
+    }
 
-	// Use this for initialization
-	void Start()
-	{
-		enemy = GetComponent<Transform>();
-		enemyCollider = GetComponent<Collider2D>();
-		anim = GetComponent<Animator>();
-		GameManager.Instance.RegisterEnemy(this);
-	}
+    void Start()
+    {
+        enemy = GetComponent<Transform>(); // lấy transform của enemy
+        enemyCollider = GetComponent<Collider2D>(); // lấy collider của enemy
+        anim = GetComponent<Animator>(); // lấy animator của enemy
+        GameManager.Instance.RegisterEnemy(this); // thêm enemy vào danh sách enemy
+    }
 
-	// Update is called once per frame
-	void Update()
-	{
-		if (wayPoints != null && !isDead)
-		{
-			//Lets use change how fast the update occurs
-			navigationTime += Time.deltaTime;
-			if (navigationTime > navigationUpdate)
-			{
-				//If enemy is not at the last wayPoint, keep moving towards the wayPoint
-				//otherwise move to the exitPoint
-				if (target < wayPoints.Length)
-				{
-					enemy.position = Vector2.MoveTowards(enemy.position, wayPoints[target].position, navigationTime);
-				}
-				else
-				{
-					enemy.position = Vector2.MoveTowards(enemy.position, exitPoint.position, navigationTime);
-				}
-				navigationTime = 0;
-			}
-		}
-	}
+    void Update()
+    {
+        // nếu enemy chưa chết và mảng wayPoints khác null
+        if (wayPoints != null && !isDead)
+        {
+            // Tính thời gian di chuyển của enemy = thời gian di chuyển cũ + thời gian thực
+            navigationTime += Time.deltaTime;
+            if (navigationTime > navigationUpdate)
+            {
+                // nếu enemy chưa đến điểm cuối cùng, di chuyển đến điểm tiếp theo
+                if (target < wayPoints.Length)
+                {
+                    enemy.position = Vector2.MoveTowards(enemy.position, wayPoints[target].position, navigationTime);
+                }
+                else
+                {
+                    // nếu đã đến điểm cuối cùng, di chuyển đến điểm cuối
+                    enemy.position = Vector2.MoveTowards(enemy.position, exitPoint.position, navigationTime);
+                }
+                navigationTime = 0; // reset thời gian di chuyển
+            }
+        }
+    }
 
-	//If we trigger the collider2D.tag for checkpoints for finish. 
-	//If it hits the checkpoints, increase the index and move to the next checkpoint
-	//otherwise enemy is at the finish line and should be destroyed.
-	void OnTriggerEnter2D(Collider2D collider2D)
-	{
-		if (collider2D.tag == "checkpoint")
-			target += 1;
-		else if (collider2D.tag == "Finish")
-		{
-			GameManager.Instance.RoundEscaped += 1;
-			GameManager.Instance.TotalEscape += 1;
-			GameManager.Instance.UnregisterEnemy(this);
-			GameManager.Instance.isWaveOver();
-		}
-		else if (collider2D.tag == "projectile")
-		{
-			Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
+    /// <summary>
+    /// Kiểm tra enemy đến điểm checkpoint hay điểm cuối cùng
+    /// </summary>
+    void OnTriggerEnter2D(Collider2D collider2D)
+    {
+        if (collider2D.tag == "checkpoint") target += 1; // nếu enemy đến checkpoint, tăng index và di chuyển đến checkpoint tiếp theo
+        else if (collider2D.tag == "Finish")
+        {
+            // nếu enemy đến điểm cuối cùng, di chuyển đến điểm cuối
+            GameManager.Instance.RoundEscaped += 1; // tăng số lượng enemy chạy thoát
+            GameManager.Instance.TotalEscape += 1; // tăng số lượng enemy chạy thoát
+            GameManager.Instance.UnregisterEnemy(this); // xóa enemy khỏi danh sách enemy
+            GameManager.Instance.IsWaveOver(); // kiểm tra xem wave đã kết thúc chưa
+        }
+        else if (collider2D.tag == "projectile")
+        {
+            Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
+            try
+            {
+                if (newP != null) EnemyHit(newP.AttackStrength); // nếu enemy bị trúng đạn, giảm máu và xóa đạn
+            }
+            catch (NullReferenceException ex)
+            {
+                Debug.LogWarning("Projectile component not found on the colliding object with tag 'projectile'." + ex.Message);
+            }
+            Destroy(collider2D.gameObject);
+        }
+    }
+    /// <summary>
+    /// Giảm máu của enemy khi bị trúng đạn
+    /// </summary>
+    public void EnemyHit(int hitPoints)
+    {
+        try
+        {
+            if (healthPoints - hitPoints > 0)
+            {
+                // nếu máu còn lớn hơn 0, giảm máu và chạy animation Hurt
+                healthPoints -= hitPoints;
+                anim.Play("Hurt");
+                GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Hit);
+            }
+            else
+            {
+                // nếu máu nhỏ hơn 0, chạy animation Die
+                anim.SetTrigger("didDie");
+                Die();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+        }
+    }
 
-			enemyHit(newP.AttackStrength);
+    /// <summary>
+    /// Xóa enemy khỏi danh sách enemy và thêm tiền vào tài khoản
+    /// </summary>
+    public void Die()
+    {
+        isDead = true; // đánh dấu enemy đã chết
+        enemyCollider.enabled = false; // tắt collider của enemy
+        GameManager.Instance.TotalKilled += 1; // tăng số lượng enemy bị giết
+        GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Death); // chạy âm thanh khi enemy chết
+        GameManager.Instance.AddMoney(rewardAmount); // thêm tiền vào tài khoản
+        GameManager.Instance.IsWaveOver(); // kiểm tra xem wave đã kết thúc chưa
 
-			Destroy(collider2D.gameObject);
-		}
-	}
-	public void enemyHit(int hitPoints)
-	{
-		try
-		{
-			if (healthPoints - hitPoints > 0)
-			{
-				healthPoints -= hitPoints;
-				anim.Play("Hurt");
-				GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Hit);
-			}
-			else
-			{
-				anim.SetTrigger("didDie");
-				die();
-			}
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError(ex);
-		}
-	}
-
-	public void die()
-	{
-		isDead = true;
-		enemyCollider.enabled = false;
-		GameManager.Instance.TotalKilled += 1;
-		GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.Death);
-		GameManager.Instance.AddMoney(rewardAmount);
-		GameManager.Instance.isWaveOver();
-	}
+        // xóa enemy khỏi danh sách enemy sau 3 giây
+        Destroy(gameObject, 3);
+    }
 }
