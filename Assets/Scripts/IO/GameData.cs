@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Assets.Scripts.IO
 {
@@ -22,6 +17,6 @@ namespace Assets.Scripts.IO
         public int enemiesPerSpawn;
         public float spawnDelay;
         public float[] enemySpawnRates;
-        public Enemy[] enemyList;
+        public Enemy03[] enemyList;
     }
 }

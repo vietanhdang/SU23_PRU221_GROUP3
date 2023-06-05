@@ -1,7 +1,6 @@
 ﻿using Assets.Scripts.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +19,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     private GameObject spawnPoint; // điểm xuất hiện enemy
     [SerializeField]
-    private Enemy[] enemies; // danh sách enemy
+    private Enemy03[] enemies; // danh sách enemy
     [SerializeField]
     private int totalEnemies = 3; // số lượng enemy trong wave
     [SerializeField]
@@ -47,7 +46,7 @@ public class GameManager : Singleton<GameManager>
     private gameStatus currentState = gameStatus.play; // trạng thái game hiện tại
     private AudioSource audioSource;
 
-    public List<Enemy> EnemyList = new List<Enemy>(); // danh sách enemy trong wave hiện tại
+    public List<Enemy03> EnemyList = new List<Enemy03>(); // danh sách enemy trong wave hiện tại
     private float spawnDelay = 1.5f; // thời gian delay giữa 2 lần spawn enemy
     public int TotalMoney
     {
@@ -177,15 +176,15 @@ public class GameManager : Singleton<GameManager>
                     if (whichEnemiesToSpawn == 0) // nếu số lượng enemy còn lại trong wave bằng 0
                     {
                         // Tạo một queue mới từ danh sách enemy
-                        Queue<Enemy> enemyQueue = new Queue<Enemy>(enemies);
+                        Queue<Enemy03> enemyQueue = new Queue<Enemy03>(enemies);
                         whichEnemiesToSpawn = enemyQueue.Count;
                     }
 
                     // Lấy enemy từ đầu queue và spawn nó để tạo ra enemy trong game
-                    Enemy enemyToSpawn = whichEnemiesToSpawn > 0 ? enemies[enemies.Length - whichEnemiesToSpawn] : null; // lấy enemy từ danh sách enemy
+                    Enemy03 enemyToSpawn = whichEnemiesToSpawn > 0 ? enemies[enemies.Length - whichEnemiesToSpawn] : null; // lấy enemy từ danh sách enemy
                     if (enemyToSpawn != null) // nếu enemy khác null
                     {
-                        Enemy newEnemy = Instantiate(enemyToSpawn); // tạo ra enemy mới
+                        Enemy03 newEnemy = Instantiate(enemyToSpawn); // tạo ra enemy mới
                         newEnemy.transform.position = spawnPoint.transform.position; // set vị trí cho enemy
                         whichEnemiesToSpawn--; // giảm số lượng enemy còn lại trong wave
                     }
@@ -199,7 +198,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// Đăng ký enemy vào danh sách enemy
     /// </summary>
-    public void RegisterEnemy(Enemy enemy)
+    public void RegisterEnemy(Enemy03 enemy)
     {
         EnemyList.Add(enemy);
     }
@@ -207,7 +206,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// Xóa enemy khỏi danh sách enemy
     /// </summary>
-    public void UnregisterEnemy(Enemy enemy)
+    public void UnregisterEnemy(Enemy03 enemy)
     {
         EnemyList.Remove(enemy);
         Destroy(enemy.gameObject);
@@ -218,7 +217,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void DestroyAllEnemies()
     {
-        foreach (Enemy enemy in EnemyList)
+        foreach (Enemy03 enemy in EnemyList)
         {
             if (enemy != null)
             {

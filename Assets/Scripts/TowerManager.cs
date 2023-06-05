@@ -1,19 +1,19 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class TowerManager : Singleton<TowerManager>
 {
     public TowerButton towerButtonPressed { get; set; } // Button chọn tower
     private SpriteRenderer spriteRenderer;  // Sprite của tower
     public bool IsPreventCreateTower { get; set; } = false; // Kiểm tra xem có thể tạo tower hay không
-    private List<Tower> TowerList = new List<Tower>(); // Danh sách các tower
+    private List<Tower03> TowerList = new List<Tower03>(); // Danh sách các tower
     private List<Collider2D> BuildList = new List<Collider2D>(); // Danh sách các build site (nơi có thể xây tower)
     private Collider2D buildTile; // Collider của build site
     private Dictionary<Collider2D, int> buildTileAndIndexOfTower = new Dictionary<Collider2D, int>(); // Danh sách các build site và index của tower
-    private Dictionary<int, Tower> towerAndIndexOfTower = new Dictionary<int, Tower>(); // Danh sách các tower và index của tower
+    private Dictionary<int, Tower03> towerAndIndexOfTower = new Dictionary<int, Tower03>(); // Danh sách các tower và index của tower
     private int indexOfTower; // Index của tower
     private Collider2D hitObject; // Collider của object được click
     private GameObject buttonUpgrade; // Button upgrade tower
@@ -64,13 +64,13 @@ public class TowerManager : Singleton<TowerManager>
                 // Nếu click vào build site full thì chọn tower
                 hitObject = hit.collider; // Lấy collider của object được click
                 int index = buildTileAndIndexOfTower.FirstOrDefault(x => x.Key.Equals(hitObject)).Value; // Lấy index của tower
-                Tower tower; // Tower được chọn
+                Tower03 tower; // Tower được chọn
                 towerAndIndexOfTower.TryGetValue(index, out tower); // Lấy tower được chọn
                 if (tower == null) return; // Nếu tower không tồn tại thì return
                 if (!tower.isSelected)
                 {
                     // Nếu tower chưa được chọn thì chọn tower
-                    foreach (Tower otherTower in towerAndIndexOfTower.Values)
+                    foreach (Tower03 otherTower in towerAndIndexOfTower.Values)
                     {
                         if (otherTower.isSelected)
                         {
@@ -116,7 +116,7 @@ public class TowerManager : Singleton<TowerManager>
             if (selectedIndex != 0 && hit.collider.tag == "ground")
             {
                 // Nếu click vào ground thì bỏ chọn tất cả các tower
-                foreach (Tower otherTower in towerAndIndexOfTower.Values)
+                foreach (Tower03 otherTower in towerAndIndexOfTower.Values)
                 {
                     if (otherTower.isSelected)
                     {
@@ -147,7 +147,7 @@ public class TowerManager : Singleton<TowerManager>
     public void ClickUpgrade()
     {
         if (IsPreventCreateTower) return; // Nếu không có quyền tạo tower thì return
-        Tower tower; // Tower được chọn
+        Tower03 tower; // Tower được chọn
         towerAndIndexOfTower.TryGetValue(selectedIndex, out tower); // Lấy tower được chọn
         if (tower == null) return; // Nếu tower không tồn tại thì return
         levelDisplay = GameObject.FindWithTag("upgradePrice").GetComponent<Text>(); // Lấy text hiển thị level của tower
@@ -227,7 +227,7 @@ public class TowerManager : Singleton<TowerManager>
     /// <summary>
     /// Thêm tower vào danh sách tower
     /// </summary>
-    public void RegisterTower(Tower tower)
+    public void RegisterTower(Tower03 tower)
     {
         towerAndIndexOfTower.Add(indexOfTower, tower);
     }
@@ -249,7 +249,7 @@ public class TowerManager : Singleton<TowerManager>
     /// </summary>
     public void DestroyAllTower()
     {
-        foreach (Tower tower in towerAndIndexOfTower.Values)
+        foreach (Tower03 tower in towerAndIndexOfTower.Values)
         {
             if (tower == null) continue; // Nếu tower không tồn tại thì bỏ qua
             Destroy(tower.gameObject); // Xóa tower
@@ -266,7 +266,7 @@ public class TowerManager : Singleton<TowerManager>
         /// Tạo tower mới tại vị trí click chuột
         if (towerButtonPressed != null && towerButtonPressed.TowerPrice <= GameManager.Instance.TotalMoney)
         {
-            Tower newTower = Instantiate(towerButtonPressed.TowerObject); // Tạo tower mới
+            Tower03 newTower = Instantiate(towerButtonPressed.TowerObject); // Tạo tower mới
             newTower.transform.position = hit.transform.position; // Đặt tower mới tại vị trí click chuột
             BuyTower(towerButtonPressed.TowerPrice); // Trừ tiền khi tạo tower
             GameManager.Instance.AudioSource.PlayOneShot(SoundManager.Instance.TowerBuilt); // Phát âm thanh khi tạo tower

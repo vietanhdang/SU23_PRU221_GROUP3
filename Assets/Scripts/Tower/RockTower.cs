@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class RockTower : Tower
+public class RockTower : Tower03
 {
     // Start is called before the first frame update
     public override void Start()
