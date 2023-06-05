@@ -1,7 +1,7 @@
 # GROUP 3 - TOWER DEFENSE GAME
 ## Members
 - [x] 1. Đặng Việt Anh     - HE151359
-- [x] 2. Nguyễn Đình Thằng - HE151348
+- [x] 2. Nguyễn Đình Thắng - HE151348
 - [x] 3. Nguyễn Quốc Anh   - HE151349
 - [x] 4. Trần Xuân Quang   - HE153654
 - [x] 5. Tô Quang Huy      - HE151216
