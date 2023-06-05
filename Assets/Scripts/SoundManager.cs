@@ -1,27 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
-public class SoundManager : Singleton<SoundManager> {
+public class SoundManager : Singleton<SoundManager>
+{
 
     [SerializeField]
-    private AudioClip arrow;
+    private AudioClip arrow; // tiếng bắn tên
     [SerializeField]
-    private AudioClip death;
+    private AudioClip death; // tiếng chết
     [SerializeField]
-    private AudioClip fireball;
+    private AudioClip fireball; // tiếng bắn lửa
     [SerializeField]
-    private AudioClip gameover;
+    private AudioClip gameover; // tiếng gameover
     [SerializeField]
-    private AudioClip hit;
+    private AudioClip hit; // tiếng đánh
     [SerializeField]
-    private AudioClip level;
+    private AudioClip level; // tiếng level up
     [SerializeField]
-    private AudioClip newGame;
+    private AudioClip newGame; // tiếng bắt đầu game
     [SerializeField]
-    private AudioClip rock;
+    private AudioClip rock; // tiếng đá
     [SerializeField]
-    private AudioClip towerBuilt;
+    private AudioClip towerBuilt; // tiếng xây tháp
 
     public AudioClip Arrow
     {

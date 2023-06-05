@@ -29665,7 +29665,7 @@ GameObject:
   - component: {fileID: 1286182365}
   m_Layer: 5
   m_Name: MoneyLabel
-  m_TagString: Untagged
+  m_TagString: moneyDisplay
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -37514,7 +37514,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1744587058}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!124 &1744587060
 Behaviour:
   m_ObjectHideFlags: 0
@@ -46288,7 +46288,7 @@ GameObject:
   - component: {fileID: 2039729498}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: Untagged
+  m_TagString: moneyDisplay
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49015,12 +49015,12 @@ PrefabInstance:
     - target: {fileID: 3944566966760069584, guid: ff1b6193f0d018844b584210525a6aef,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 2
+      value: -73
       objectReference: {fileID: 0}
     - target: {fileID: 3944566966760069584, guid: ff1b6193f0d018844b584210525a6aef,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 12
+      value: 11.10498
       objectReference: {fileID: 0}
     - target: {fileID: 3944566966760069584, guid: ff1b6193f0d018844b584210525a6aef,
         type: 3}
@@ -49088,6 +49088,22 @@ PrefabInstance:
       propertyPath: m_TagString
       value: upgradePrice
       objectReference: {fileID: 0}
+    - target: {fileID: 1410335326, guid: 4c2842a9c5f81734c862e28f37d42ae3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 89.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410335326, guid: 4c2842a9c5f81734c862e28f37d42ae3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 69.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410335326, guid: 4c2842a9c5f81734c862e28f37d42ae3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 3.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410335326, guid: 4c2842a9c5f81734c862e28f37d42ae3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 3.23
+      objectReference: {fileID: 0}
     - target: {fileID: 1410335327, guid: 4c2842a9c5f81734c862e28f37d42ae3, type: 3}
       propertyPath: m_FontData.m_MinSize
       value: 1
@@ -49134,12 +49150,12 @@ PrefabInstance:
     - target: {fileID: 3890347225610089917, guid: 4c2842a9c5f81734c862e28f37d42ae3,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 110
+      value: 117.63
       objectReference: {fileID: 0}
     - target: {fileID: 3890347225610089917, guid: 4c2842a9c5f81734c862e28f37d42ae3,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 113.35
       objectReference: {fileID: 0}
     - target: {fileID: 3890347225610089917, guid: 4c2842a9c5f81734c862e28f37d42ae3,
         type: 3}
@@ -49194,12 +49210,12 @@ PrefabInstance:
     - target: {fileID: 3890347225610089917, guid: 4c2842a9c5f81734c862e28f37d42ae3,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 2
+      value: -3.5900269
       objectReference: {fileID: 0}
     - target: {fileID: 3890347225610089917, guid: 4c2842a9c5f81734c862e28f37d42ae3,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 8
+      value: 17.78003
       objectReference: {fileID: 0}
     - target: {fileID: 3890347225610089917, guid: 4c2842a9c5f81734c862e28f37d42ae3,
         type: 3}
