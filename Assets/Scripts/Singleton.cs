@@ -3,9 +3,7 @@
 //Generic Singleton Class
 //Singletons are classes that can only have 1 object (or instance) at a time.
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
-
     private static T instance;
-
     public static T Instance
     {
         get
