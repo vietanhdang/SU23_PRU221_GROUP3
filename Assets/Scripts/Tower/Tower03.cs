@@ -66,7 +66,26 @@ public class Tower03 : MonoBehaviour
     public virtual void Attack()
     {
         isAttacking = false;
-        Projectile newProjectile = Instantiate(projectile) as Projectile;
+        Projectile newProjectile = new Projectile();
+		if (level == 1)
+		{
+            newProjectile = Instantiate(projectile) as Projectile;
+			SpriteRenderer projectileSpriteRenderer = newProjectile.GetComponent<SpriteRenderer>();
+			projectileSpriteRenderer.color = Color.green;
+		}
+
+		if (level == 2) {
+			newProjectile = Instantiate(projectile) as Projectile;
+			SpriteRenderer projectileSpriteRenderer = newProjectile.GetComponent<SpriteRenderer>();
+			projectileSpriteRenderer.color = Color.red;
+			newProjectile.ProjectileLevel = 2;
+		}
+        if (level == 3)
+        {
+			newProjectile = Instantiate(projectile) as Projectile;
+			newProjectile.ProjectileLevel = 3;
+		}
+
         newProjectile.transform.localPosition = transform.position;
 
         if (newProjectile.ProjectileType == ProjectileType.arrow)

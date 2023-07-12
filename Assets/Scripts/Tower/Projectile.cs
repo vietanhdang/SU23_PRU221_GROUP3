@@ -20,6 +20,8 @@ public class Projectile : MonoBehaviour
         get { return attackStrength; }
     }
 
+    public int ProjectileLevel { get; set; } = 1;
+
     public ProjectileType ProjectileType
     {
         get { return projectileType; }
