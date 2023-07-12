@@ -15,15 +15,15 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     private Text currentWaveLabel; // wave hiện tại
     [SerializeField]
-    private Text totalEscapedLabel; // số lượng enemy đã thoát
+    private Text totalEscapedLabel; // số lượng enemy đã thoát trong tất cả các wave
     [SerializeField]
     private GameObject spawnPoint; // điểm xuất hiện enemy
     [SerializeField]
-    private Enemy03[] enemies; // danh sách enemy
+    private Enemy03[] enemies; // danh sách enemy trong wave
     [SerializeField]
     private int totalEnemies = 3; // số lượng enemy trong wave
     [SerializeField]
-    private int enemiesPerSpawn; // số lượng enemy spawn trong 1 lần
+    private int enemiesPerSpawn; // số lượng enemy sinh ra trong 1 lần
     [SerializeField]
     private Text playButtonLabel; // label của button play
     [SerializeField]
@@ -162,36 +162,35 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
-    /// Spawn enemy dùng để tạo ra enemy trong game và thêm vào danh sách enemy
+    /// Hàm sinh ra enemy sẽ chạy liên tục cho đến khi số lượng enemy trong danh sách enemy bằng tổng số lượng enemy trong wave
     /// </summary>
     IEnumerator Spawn()
     {
         // nếu số lượng enemy còn lại trong wave lớn hơn 0 và số lượng enemy trong danh sách enemy nhỏ hơn tổng số lượng enemy trong wave
         if (enemiesPerSpawn > 0 && EnemyList.Count < totalEnemies)
         {
-            for (int i = 0; i < enemiesPerSpawn; i++) // vòng lặp spawn enemy
+            for (int i = 0; i < enemiesPerSpawn; i++)
             {
                 if (EnemyList.Count < totalEnemies) // nếu số lượng enemy trong danh sách enemy nhỏ hơn tổng số lượng enemy trong wave
                 {
                     if (whichEnemiesToSpawn == 0) // nếu số lượng enemy còn lại trong wave bằng 0
                     {
-                        // Tạo một queue mới từ danh sách enemy
-                        Queue<Enemy03> enemyQueue = new Queue<Enemy03>(enemies);
-                        whichEnemiesToSpawn = enemyQueue.Count;
+                        whichEnemiesToSpawn = enemies.Length; // set số lượng enemy còn lại trong wave bằng tổng số lượng enemy trong wave
                     }
 
                     // Lấy enemy từ đầu queue và spawn nó để tạo ra enemy trong game
                     Enemy03 enemyToSpawn = whichEnemiesToSpawn > 0 ? enemies[enemies.Length - whichEnemiesToSpawn] : null; // lấy enemy từ danh sách enemy
                     if (enemyToSpawn != null) // nếu enemy khác null
                     {
-                        Enemy03 newEnemy = Instantiate(enemyToSpawn); // tạo ra enemy mới
+                        Enemy03 newEnemy = Instantiate(enemyToSpawn); // tạo ra enemy mới từ enemyToSpawn
                         newEnemy.transform.position = spawnPoint.transform.position; // set vị trí cho enemy
                         whichEnemiesToSpawn--; // giảm số lượng enemy còn lại trong wave
                     }
                 }
             }
             yield return new WaitForSeconds(spawnDelay); // delay giữa 2 lần spawn enemy
-            StartCoroutine(Spawn()); // gọi lại hàm spawn
+            //thực hiện các tác vụ dài hạn, quản lý thời gian chờ giữa các lần spawn enemy
+            StartCoroutine(Spawn()); // gọi lại hàm spawn (hàm StartCoroutine sẽ tạo ra một thread mới và gọi hàm Spawn trong thread đó)
         }
     }
 
@@ -248,15 +247,15 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void IsWaveOver()
     {
-        totalEscapedLabel.text = "Escaped " + TotalEscape + "/10";
-        if (RoundEscaped + TotalKilled == totalEnemies)
+        totalEscapedLabel.text = "Escaped " + TotalEscape + "/10"; // set số lượng enemy đã thoát
+        if (RoundEscaped + TotalKilled == totalEnemies) // nếu số lượng enemy đã thoát + số lượng enemy đã bị giết = tổng số lượng enemy trong wave
         {
             if (waveNumber <= enemies.Length)
-            {
-                enemiesToSpawn = waveNumber;
+            {   // nếu wave hiện tại nhỏ hơn tổng số lượng wave
+                enemiesToSpawn = waveNumber; // set số lượng enemy cần spawn trong wave hiện tại
             }
-            SetCurrentGameState();
-            ShowMenu();
+            SetCurrentGameState(); // set trạng thái game
+            ShowMenu(); // hiển thị menu
         }
     }
 
@@ -288,7 +287,9 @@ public class GameManager : Singleton<GameManager>
         {
             case gameStatus.gameover:
                 playButtonLabel.text = "Play Again!";
+                currentState = gameStatus.start;
                 AudioSource.PlayOneShot(SoundManager.Instance.Gameover);
+                playButtonPressed();
                 break;
             case gameStatus.next:
                 playButtonLabel.text = "Next Wave";

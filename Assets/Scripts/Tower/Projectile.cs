@@ -2,18 +2,18 @@
 
 public enum ProjectileType
 {
-    rock,
-    arrow,
-    fireball
+    rock, // Đá
+    arrow, // Mũi tên
+    fireball // Bóng lửa
 };
 
 public class Projectile : MonoBehaviour
 {
     [SerializeField]
-    private int attackStrength;
+    public int attackStrength; // Sức mạnh của projectile
 
     [SerializeField]
-    private ProjectileType projectileType;
+    private ProjectileType projectileType; // Loại projectile
 
     public int AttackStrength
     {

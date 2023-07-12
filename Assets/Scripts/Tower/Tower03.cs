@@ -33,11 +33,11 @@ public class Tower03 : MonoBehaviour
     // Update is called once per frame
     public virtual void Update()
     {
-        timer.Duration = TimeBetweenAttacks;
-        //If our closest enemy in range and if its within our attackRange, set our target enemy to the closest enemy in range.
-        if (targetEnemy == null || targetEnemy.IsDead)
+        timer.Duration = TimeBetweenAttacks; // thiết lập thời gian giữa 2 lần tấn công
+        // nếu enemy gần nhất trong tầm tấn công và nó trong tầm tấn công của chúng ta, thiết lập enemy đó làm mục tiêu
+        if (targetEnemy == null || targetEnemy.IsDead) // nếu enemy đang bị chết hoặc không có enemy nào trong tầm tấn công
         {
-            Enemy03 closestEnemy = GetClosestEnemyInRange();
+            Enemy03 closestEnemy = GetClosestEnemyInRange(); // lấy enemy gần nhất trong tầm tấn công
             if (closestEnemy != null && Vector2.Distance(transform.localPosition, closestEnemy.transform.position) <= AttackRange)
             {
                 targetEnemy = closestEnemy;
@@ -92,24 +92,27 @@ public class Tower03 : MonoBehaviour
         }
     }
 
-    ///Move Projectile to Target Enemy
+    /// <summary>
+    /// Di chuyển projectile đến enemy (bắn ra từ tower)
+    /// </summary>
     IEnumerator MoveProjectile(Projectile projectile)
     {
+        // nêu enemy chưa chết và khoảng cách từ projectile đến enemy > 0.20f
         while (getTargetDistance(targetEnemy) > 0.20f && projectile != null && targetEnemy != null)
         {
             if (targetEnemy == null || targetEnemy.IsDead)
             {
                 break;
             }
-            var dir = targetEnemy.transform.localPosition - transform.localPosition;
-            var angleDirection = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;                         //Angle of the projectile
-            projectile.transform.rotation = Quaternion.AngleAxis(angleDirection, Vector3.forward);  //Rotation of projectile
+            var dir = targetEnemy.transform.localPosition - transform.localPosition;               // hướng của projectile
+            var angleDirection = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;                         // Góc của projectile
+            projectile.transform.rotation = Quaternion.AngleAxis(angleDirection, Vector3.forward);  // Xoay projectile
             projectile.transform.localPosition = Vector2.MoveTowards(projectile.transform.localPosition, targetEnemy.transform.localPosition, 5f * Time.deltaTime); //Move Projectile
-            yield return null;
+            yield return null; // wait 1 frame
         }
         if (projectile != null || targetEnemy == null)
         {
-            Destroy(projectile);
+            Destroy(projectile); // destroy projectile
         }
     }
 
@@ -128,7 +131,9 @@ public class Tower03 : MonoBehaviour
         }
         return Mathf.Abs(Vector2.Distance(transform.localPosition, enemy.transform.localPosition));
     }
-    ///Get Enemies in Attack Range
+    /// <summary>
+    /// Lấy danh sách enemy trong tầm tấn công
+    /// </summary>
     protected List<Enemy03> GetEnemiesInRange()
     {
         List<Enemy03> enemiesInRange = new List<Enemy03>();
@@ -146,15 +151,18 @@ public class Tower03 : MonoBehaviour
         }
         return enemiesInRange;
     }
-    ///Get Closest Enemy - Foreach enemy in range, get the closest enemy
+    /// <summary>
+    /// Tìm enemy gần nhất trong tầm tấn công
+    /// </summary>
     protected Enemy03 GetClosestEnemyInRange()
     {
-        Enemy03 closestEnemy = null;
-        float smallestDistance = float.PositiveInfinity;
+        Enemy03 closestEnemy = null; // enemy gần nhất
+        float smallestDistance = float.PositiveInfinity; // khoảng cách nhỏ nhất
         foreach (Enemy03 enemy in GetEnemiesInRange())
         {
             if (Vector2.Distance(transform.localPosition, enemy.transform.localPosition) < smallestDistance)
             {
+                // nếu khoảng cách từ enemy đến chúng ta nhỏ hơn khoảng cách nhỏ nhất
                 smallestDistance = Vector2.Distance(transform.localPosition, enemy.transform.localPosition);
                 closestEnemy = enemy;
             }
