@@ -5,7 +5,6 @@ using UnityEngine;
 public class Tower03 : MonoBehaviour
 {
     public float TimeBetweenAttacks { get; set; }    //AKA - Attack Speed
-
     public float AttackRange { get; set; }      //AKA - Attack Radius
     [SerializeField]
     public Projectile projectile;      //Type of Projectile
@@ -14,8 +13,6 @@ public class Tower03 : MonoBehaviour
     public bool isSelected = false;
     public bool firstPlace = true;
     public int level = 1;
-
-
     Timer timer;
     protected void Init(float timeBetweenAttacks, float attackRange)
     {
@@ -66,25 +63,26 @@ public class Tower03 : MonoBehaviour
     public virtual void Attack()
     {
         isAttacking = false;
-        Projectile newProjectile = new Projectile();
-		if (level == 1)
-		{
+        Projectile newProjectile = null;
+        if (level == 1)
+        {
             newProjectile = Instantiate(projectile) as Projectile;
-			SpriteRenderer projectileSpriteRenderer = newProjectile.GetComponent<SpriteRenderer>();
-			projectileSpriteRenderer.color = Color.green;
-		}
+            SpriteRenderer projectileSpriteRenderer = newProjectile.GetComponent<SpriteRenderer>();
+            projectileSpriteRenderer.color = Color.green;
+        }
 
-		if (level == 2) {
-			newProjectile = Instantiate(projectile) as Projectile;
-			SpriteRenderer projectileSpriteRenderer = newProjectile.GetComponent<SpriteRenderer>();
-			projectileSpriteRenderer.color = Color.red;
-			newProjectile.ProjectileLevel = 2;
-		}
+        if (level == 2)
+        {
+            newProjectile = Instantiate(projectile) as Projectile;
+            SpriteRenderer projectileSpriteRenderer = newProjectile.GetComponent<SpriteRenderer>();
+            projectileSpriteRenderer.color = Color.red;
+            newProjectile.ProjectileLevel = 2;
+        }
         if (level == 3)
         {
-			newProjectile = Instantiate(projectile) as Projectile;
-			newProjectile.ProjectileLevel = 3;
-		}
+            newProjectile = Instantiate(projectile) as Projectile;
+            newProjectile.ProjectileLevel = 3;
+        }
 
         newProjectile.transform.localPosition = transform.position;
 

@@ -183,7 +183,10 @@ public class GameManager : Singleton<GameManager>
                     if (enemyToSpawn != null) // nếu enemy khác null
                     {
                         Enemy03 newEnemy = Instantiate(enemyToSpawn); // tạo ra enemy mới từ enemyToSpawn
-                        newEnemy.transform.position = spawnPoint.transform.position; // set vị trí cho enemy
+                        newEnemy.transform.position = spawnPoint.transform.position; // set vị trí cho enemy                  
+                        var newEnemyObject = newEnemy.GetComponent<Enemy03>();
+                        newEnemyObject.healthPoints += (waveNumber * 2);
+                        Debug.Log("Enemy health: " + newEnemyObject.healthPoints);
                         whichEnemiesToSpawn--; // giảm số lượng enemy còn lại trong wave
                     }
                 }
@@ -193,23 +196,6 @@ public class GameManager : Singleton<GameManager>
             StartCoroutine(Spawn()); // gọi lại hàm spawn (hàm StartCoroutine sẽ tạo ra một thread mới và gọi hàm Spawn trong thread đó)
         }
     }
-
-    //IEnumerator Spawn()
-    //{
-    //	if (enemiesPerSpawn > 0 && EnemyList.Count < totalEnemies)
-    //	{
-    //		for (int i = 0; i < enemiesPerSpawn; i++)
-    //		{
-    //			if (EnemyList.Count < totalEnemies)
-    //			{
-    //				Enemy03 newEnemy = Instantiate(enemies[Random.Range(0, enemiesToSpawn)]);
-    //				newEnemy.transform.position = spawnPoint.transform.position;
-    //			}
-    //		}
-    //		yield return new WaitForSeconds(spawnDelay);
-    //		StartCoroutine(Spawn());
-    //	}
-    //}
 
     /// <summary>
     /// Đăng ký enemy vào danh sách enemy
