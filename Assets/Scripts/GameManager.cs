@@ -194,6 +194,23 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    //IEnumerator Spawn()
+    //{
+    //	if (enemiesPerSpawn > 0 && EnemyList.Count < totalEnemies)
+    //	{
+    //		for (int i = 0; i < enemiesPerSpawn; i++)
+    //		{
+    //			if (EnemyList.Count < totalEnemies)
+    //			{
+    //				Enemy03 newEnemy = Instantiate(enemies[Random.Range(0, enemiesToSpawn)]);
+    //				newEnemy.transform.position = spawnPoint.transform.position;
+    //			}
+    //		}
+    //		yield return new WaitForSeconds(spawnDelay);
+    //		StartCoroutine(Spawn());
+    //	}
+    //}
+
     /// <summary>
     /// Đăng ký enemy vào danh sách enemy
     /// </summary>
