@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Assets.Scripts.CustomException;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -36,14 +38,27 @@ namespace Assets.Scripts.IO
 
         public GameData LoadDefaultGameData()
         {
-            string data = File.ReadAllText("Assets/Scripts/IO/defaultData.json");
-            if (data == null)
+            try
             {
-                Debug.LogError("File doesn't exist.");
+                string data = File.ReadAllText("Assets/Scripts/IO/defaultData.json");
+                data = null;
+                if (data == null)
+                {
+                    throw new ExceptionHandling("File doesn't exist.", "", DateTime.Now, "43");
+                }
+                GameData gameData = JsonConvert.DeserializeObject<GameData>(data);
+                return gameData;
+            }
+            catch (ExceptionHandling ex)
+            {
+                ex.Handle();
+                return null;
+            }catch (Exception ex)
+            {
+                Debug.LogError(ex.Message);
                 return null;
             }
-            GameData gameData = JsonConvert.DeserializeObject<GameData>(data);
-            return gameData;
+            
         }
 
         public void SaveGame(GameData gameData)
