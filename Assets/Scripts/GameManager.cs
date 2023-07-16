@@ -1,4 +1,6 @@
-﻿using Assets.Scripts.IO;
+﻿using Assets.Scripts.CustomException;
+using Assets.Scripts.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -95,15 +97,31 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
-        playButton.gameObject.SetActive(false); // ẩn button play
-        continueButton.gameObject.SetActive(false); // ẩn button continue
-        fileIOManager = gameObject.AddComponent<FileIOManager>(); // thêm fileIOManager vào game
-        TowerPanel = GameObject.FindWithTag("towerPanel"); // tìm towerPanel
-        TowerPanel?.SetActive(false); // ẩn towerPanel
-        audioSource = GetComponent<AudioSource>(); // lấy audioSource
-        LoadDefaultGameData(); // load dữ liệu mặc định
-        LoadGameData(); // load dữ liệu đã lưu
-        ShowMenu(); // hiển thị menu
+        try
+        {
+            playButton.gameObject.SetActive(false); // ẩn button play
+            continueButton.gameObject.SetActive(false); // ẩn button continue
+            fileIOManager = gameObject.AddComponent<FileIOManager>(); // thêm fileIOManager vào game
+            TowerPanel = GameObject.FindWithTag("towerPanel"); // tìm towerPanel
+            TowerPanel?.SetActive(false); // ẩn towerPanel
+            audioSource = GetComponent<AudioSource>(); // lấy audioSource
+            if (audioSource == null)
+            {
+                throw new ExceptionHandling("audioSource is not found", "", DateTime.Now, "107");
+            }
+            LoadDefaultGameData(); // load dữ liệu mặc định
+            LoadGameData(); // load dữ liệu đã lưu
+            ShowMenu(); // hiển thị menu
+        }
+        catch (ExceptionHandling ex)
+        {
+            ex.Handle();
+        }
+        catch(Exception ex)
+        {
+            Debug.LogError(ex.Message);
+        }
+       
     }
 
     /// <summary>
