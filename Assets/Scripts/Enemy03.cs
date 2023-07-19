@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.CustomException;
+using System;
 using UnityEngine;
 
 public class Enemy03 : MonoBehaviour
@@ -77,11 +78,15 @@ public class Enemy03 : MonoBehaviour
             Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
             try
             {
-                if (newP != null) EnemyHit(newP.AttackStrength); // nếu enemy bị trúng đạn, giảm máu và xóa đạn
+                if (newP == null)
+                {
+                    throw new ExceptionHandling("Projectile component not found on the colliding object with tag 'projectile'", "", DateTime.Now, "77");
+                }
+                EnemyHit(newP.AttackStrength); // nếu enemy bị trúng đạn, giảm máu và xóa đạn
             }
-            catch (NullReferenceException ex)
+            catch (ExceptionHandling ex)
             {
-                Debug.LogWarning("Projectile component not found on the colliding object with tag 'projectile'." + ex.Message);
+                ex.Handle();
             }
             Destroy(collider2D.gameObject);
         }
