@@ -5,22 +5,22 @@ using UnityEngine;
 public class Enemy03 : MonoBehaviour
 {
     [SerializeField]
-    private Transform exitPoint; // Điểm cuối của enemy
+    public Transform exitPoint; // Điểm cuối của enemy
     [SerializeField]
-    private Transform[] wayPoints; // Mảng các điểm đến của enemy
+    public Transform[] wayPoints; // Mảng các điểm đến của enemy
     [SerializeField]
-    private float navigationUpdate; // Tốc độ di chuyển của enemy
+    public float navigationUpdate; // Tốc độ di chuyển của enemy
     [SerializeField]
-    private int healthPoints; // Máu của enemy
+    public int healthPoints; // Máu của enemy
     [SerializeField]
-    private int rewardAmount; // Số tiền nhận được khi giết enemy
+    public int rewardAmount; // Số tiền nhận được khi giết enemy
 
-    private int target = 0; // Điểm đến của enemy
-    private Transform enemy; // Transform của enemy
-    private Collider2D enemyCollider; // Collider của enemy
-    private Animator anim; // Animator của enemy
-    private float navigationTime = 0; // Thời gian di chuyển của enemy
-    private bool isDead = false; // Kiểm tra enemy đã chết hay chưa
+    public int target = 0; // Điểm đến của enemy
+    public Transform enemy; // Transform của enemy
+    public Collider2D enemyCollider; // Collider của enemy
+    public Animator anim; // Animator của enemy
+    public float navigationTime = 0; // Thời gian di chuyển của enemy
+    public bool isDead = false; // Kiểm tra enemy đã chết hay chưa
 
     public bool IsDead
     {
@@ -76,11 +76,23 @@ public class Enemy03 : MonoBehaviour
         else if (collider2D.tag == "projectile")
         {
             Projectile newP = collider2D.gameObject.GetComponent<Projectile>();
+
             try
             {
                 if (newP == null)
                 {
                     throw new ExceptionHandling("Projectile component not found on the colliding object with tag 'projectile'", "", DateTime.Now, "77");
+                }
+                int dameAttack = newP.AttackStrength;
+                if (newP.ProjectileLevel == 2)
+                {
+                    dameAttack += 1;
+                    navigationTime -= 0.05f;
+                }
+                if (newP.ProjectileLevel == 3)
+                {
+                    dameAttack += 3;
+                    navigationTime -= 0.1f;
                 }
                 EnemyHit(newP.AttackStrength); // nếu enemy bị trúng đạn, giảm máu và xóa đạn
             }
