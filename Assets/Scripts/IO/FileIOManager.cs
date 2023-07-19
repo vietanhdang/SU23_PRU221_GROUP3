@@ -41,7 +41,6 @@ namespace Assets.Scripts.IO
             try
             {
                 string data = File.ReadAllText("Assets/Scripts/IO/defaultData.json");
-                data = null;
                 if (data == null)
                 {
                     throw new ExceptionHandling("File doesn't exist.", "", DateTime.Now, "43");
@@ -53,7 +52,8 @@ namespace Assets.Scripts.IO
             {
                 ex.Handle();
                 return null;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Debug.LogError(ex.Message);
                 return null;
