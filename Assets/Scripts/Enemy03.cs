@@ -87,12 +87,12 @@ public class Enemy03 : MonoBehaviour
                 if (newP.ProjectileLevel == 2)
                 {
                     dameAttack += 1;
-                    navigationTime -= 0.05f;
+                    navigationTime -= 0.2f;
                 }
                 if (newP.ProjectileLevel == 3)
                 {
                     dameAttack += 3;
-                    navigationTime -= 0.1f;
+                    navigationTime -= 0.3f;
                 }
                 EnemyHit(newP.AttackStrength); // nếu enemy bị trúng đạn, giảm máu và xóa đạn
             }
