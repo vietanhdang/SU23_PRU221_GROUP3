@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Assets.Scripts.IO;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,8 +37,22 @@ namespace Assets.Scripts.CustomException
 
         public void Handle()
         {
-            Debug.LogError(Message + " - " + ErrorTimeStamp.ToString("dd/MM/yyy HH:MM:ss") + " - " + (!string.IsNullOrEmpty(Line) ? ("At line :" + Line) : "Unknown")
-                + "\n" + (!string.IsNullOrEmpty(CauseOfError) ? CauseOfError : ""));
+            string errMessage = Message + " - " + ErrorTimeStamp.ToString("dd/MM/yyy HH:MM:ss") + " - " + (!string.IsNullOrEmpty(Line) ? ("At line :" + Line) : "Unknown")
+                + "\n" + (!string.IsNullOrEmpty(CauseOfError) ? CauseOfError : "");
+            Debug.LogError(errMessage);
+            WriteToLogFile(errMessage);
+        }
+
+        private void WriteToLogFile(string errMessage)
+        {
+            string path = "Assets/Scripts/IO/LogFile.txt";
+            if (File.Exists(path))
+            {
+                using (StreamWriter writer = new StreamWriter(path, true))
+                {
+                    writer.WriteLine(errMessage);
+                }
+            }
         }
     }
 
